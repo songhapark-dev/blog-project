@@ -142,6 +142,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",   # 대체 포트
     "http://127.0.0.1:5173",
     "http://127.0.0.1:3000",
+    "https://songhaparkpharm.uk",       # 내 도메인 추가 (www 없는 버전)
+    "https://www.songhaparkpharm.uk",
 ]
 
 
