@@ -6,3 +6,5 @@ Markdown==3.10.2
 pillow==12.2.0
 python-decouple==3.8
 sqlparse==0.5.5
+dj-database-url==2.1.0
+gunicorn==21.2.0
