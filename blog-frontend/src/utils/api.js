@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// API 베이스 URL (환경변수에서 가져옴)
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// 환경 변수 걷어내고 실전 Render 백엔드 주소를 다이렉트로 꽂아버립니다!
+const API_URL = 'https://blog-backend-35eq.onrender.com';
 
 // axios 인스턴스 생성
 const api = axios.create({
