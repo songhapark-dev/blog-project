@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 
-# 1️⃣ Category 모델 (카테고리)
+# 1️. Category 모델 (카테고리)
 class Category(models.Model):
     """
     블로그 카테고리
@@ -23,7 +23,7 @@ class Category(models.Model):
         verbose_name_plural = "categories"  # Admin에서 "categorys" 아니라 "categories"로 표시
 
 
-# 2️⃣ Post 모델 (게시글)
+# 2️. Post 모델 (게시글)
 class Post(models.Model):
     """
     블로그 게시글
@@ -46,7 +46,7 @@ class Post(models.Model):
         return self.title
 
 
-# 3️⃣ Comment 모델 (댓글)
+# 3️. Comment 모델 (댓글)
 class Comment(models.Model):
     """
     게시글 댓글

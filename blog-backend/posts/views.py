@@ -12,7 +12,7 @@ from .serializers import (
 )
 
 
-# 1️⃣ Category ViewSet (카테고리)
+# 1. Category ViewSet (카테고리)
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     """
     카테고리 조회만 가능 (생성, 수정, 삭제 불가)
@@ -26,7 +26,7 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = 'id'
 
 
-# 2️⃣ Post ViewSet (게시글)
+# 2. Post ViewSet (게시글)
 class PostViewSet(viewsets.ReadOnlyModelViewSet):
     """
     게시글 조회만 가능 (생성, 수정, 삭제 불가)
@@ -103,7 +103,7 @@ class PostViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-# 3️⃣ Comment ViewSet (댓글)
+# 3. Comment ViewSet (댓글)
 class CommentViewSet(viewsets.ReadOnlyModelViewSet):
     """
     댓글 조회만 가능 (생성, 수정, 삭제 불가)

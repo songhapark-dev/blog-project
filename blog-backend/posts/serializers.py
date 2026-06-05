@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Post, Category, Comment
 
-# 1️⃣ Comment Serializer (댓글)
+# 1. Comment Serializer (댓글)
 class CommentSerializer(serializers.ModelSerializer):
     """
     댓글 직렬화
@@ -14,7 +14,7 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at']  # 자동 생성되는 필드
 
 
-# 2️⃣ Category Serializer (카테고리)
+# 2. Category Serializer (카테고리)
 class CategorySerializer(serializers.ModelSerializer):
     """
     카테고리 직렬화
@@ -30,7 +30,7 @@ class CategorySerializer(serializers.ModelSerializer):
         return obj.posts.count()
 
 
-# 3️⃣ Post List Serializer (게시글 목록 - 간단한 정보)
+# 3. Post List Serializer (게시글 목록 - 간단한 정보)
 class PostListSerializer(serializers.ModelSerializer):
     """
     게시글 목록용 (메인페이지, 검색 결과)
@@ -52,7 +52,7 @@ class PostListSerializer(serializers.ModelSerializer):
         read_only_fields = fields  # 모두 읽기 전용
 
 
-# 4️⃣ Post Detail Serializer (게시글 상세 - 모든 정보)
+# 4. Post Detail Serializer (게시글 상세 - 모든 정보)
 class PostDetailSerializer(serializers.ModelSerializer):
     """
     게시글 상세용 (상세페이지)
