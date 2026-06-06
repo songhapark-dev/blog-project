@@ -35,7 +35,7 @@ class PostListSerializer(serializers.ModelSerializer):
     """
     게시글 목록용 (메인페이지, 검색 결과)
     - 제목, 카테고리, 생성일, 조회수만 표시
-    - 본문은 표시 안 함 (많은 데이터 전송 방지)
+    - 본문요약 포함
     """
     category_name = serializers.CharField(source='category.name', read_only=True)
     
@@ -44,6 +44,8 @@ class PostListSerializer(serializers.ModelSerializer):
         fields = [
             'id', 
             'title', 
+            'content',      
+            'image',
             'category', 
             'category_name',
             'created_at', 
