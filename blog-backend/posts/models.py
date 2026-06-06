@@ -35,6 +35,9 @@ class Post(models.Model):
         on_delete=models.CASCADE,
         related_name='posts'  # Category 객체에서 .posts로 접근 가능
     )
+    # 사진 필드 추가! (Pillow를 활용하여 이미지를 저장합니다)
+    image = models.ImageField(upload_to='blog_images/', null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)  # 생성 일시 (자동)
     updated_at = models.DateTimeField(auto_now=True)      # 수정 일시 (자동)
     view_count = models.IntegerField(default=0)           # 조회수

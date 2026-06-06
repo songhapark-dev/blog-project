@@ -154,7 +154,7 @@ REST_FRAMEWORK = {
 }
 
 
-# ⭐️ Render 배포 환경에서의 호스트 도메인 자동 허용 및 확장 설정
+#  Render 배포 환경에서의 호스트 도메인 자동 허용 및 확장 설정
 if os.environ.get('RENDER_EXTERNAL_URL'):
     RENDER_EXTERNAL_URL = os.environ.get('RENDER_EXTERNAL_URL')
     
@@ -164,3 +164,8 @@ if os.environ.get('RENDER_EXTERNAL_URL'):
     
     # 프론트엔드가 배포되면 아래 배포용 CORS 설정 영역에 프론트엔드 도메인을 추가해주면 됩니다.
     # 예시: CORS_ALLOWED_ORIGINS.append("https://your-react-app.onrender.com")
+
+
+# 업로드된 사진(Media)이 저장되고 서빙되는 경로 설정
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
