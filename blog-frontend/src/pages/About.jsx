@@ -18,22 +18,17 @@ const About = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
         <div className="md:col-span-2 space-y-6 text-base leading-relaxed">
           <p>
-            로컬 약국 경력만 6년, 30대 중반이라는 적지 않은 나이에 굳이 안정적인 궤도를 이탈해 사서 고생 중인 늦깎이 이직러 
-            <strong className="text-red-600 font-semibold"> 박송하(Songha Park)</strong>입니다.
+            로컬 약국 경력만 6년, 30대 중반이라는 적지 않은 나이에 굳이 안정적인 궤도를 이탈해 사서 고생 중인 늦깎이 이직러.
           </p>
           <p>
             현재 아무런 기반도, 연고도 없이 오직 약국을 벗어나보자는 마음 하나로 
             <strong> 여행 비자 하나 들고 훌쩍 오스트리아 비엔나</strong>로 날아와 맨땅에 헤딩중.
           </p>
           <p>
-            이 블로그는 낯선 유럽 땅에서 <span className="underline decoration-red-400 font-medium">제약회사 직장 구하기</span>, 
-            <span className="underline decoration-blue-400 font-medium">독일어 괴물과 맞짱 뜨기</span>, 그리고 아주 낯설고 매력적인 오스트리아 문화에 
-            적응해 나가는 좌충우돌 라이프를 솔직하고 위트 있게 기록하는 공간입니다.
+            이 여정이 과연 인생 2막을 여는 대성공이 될지, 아니면 돈과 시간만 날린 
+            대폭망이 될지 흥미진진하게 지켜봐 주시라!
           </p>
-          <p className="bg-yellow-50 p-4 rounded-xl border border-yellow-200 text-gray-700 italic">
-            "이 여정이 과연 인생 2막의 찬란한 대성공이 될지, 아니면 돈과 시간을 날린 
-            대폭망이 될지 흥미진진하게 지켜봐 주세요"
-          </p>
+          
         </div>
 
         {/* 사이드바: 보유 기술 및 관심사 */}
