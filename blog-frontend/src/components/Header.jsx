@@ -18,34 +18,29 @@ function Header() {
       <div className="max-w-6xl mx-auto px-4 py-4">
         {/* 상단: 로고 + 네비게이션 */}
         <div className="flex items-center justify-between mb-4">
-          {/* 로고 */}
+          {/* 🇦🇹 로고 호버 컬러를 레드 톤으로 통일 */}
           <button
             onClick={handleLogoClick}
-            className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition"
+            className="text-2xl font-bold text-gray-900 hover:text-red-500 transition"
           >
-            📝 My Blog
+            🇦🇹 Songha's Blog
           </button>
 
-          {/* 네비게이션 링크 */}
+          {/* 네비게이션 링크 (연락처 제거 및 톤 정렬) */}
           <nav className="flex gap-6">
             <Link
               to="/"
-              className="text-gray-700 hover:text-blue-600 font-medium transition"
+              className="text-gray-600 hover:text-red-500 font-medium transition"
             >
               홈
             </Link>
-            <a
-              href="#about"
-              className="text-gray-700 hover:text-blue-600 font-medium transition"
+            
+            <Link 
+              to="/about" 
+              className="text-gray-600 hover:text-red-500 font-medium transition"
             >
               소개
-            </a>
-            <a
-              href="#contact"
-              className="text-gray-700 hover:text-blue-600 font-medium transition"
-            >
-              연락처
-            </a>
+            </Link>
           </nav>
         </div>
 
@@ -56,9 +51,9 @@ function Header() {
           </div>
         </div>
 
-        {/* 하단: 프로필 미니 섹션 (선택) */}
-        <div className="text-center text-sm text-gray-600 pb-2">
-          <p>Welcome to My Blog</p>
+        {/* 하단: 프로필 미니 섹션 (위트 있는 한 줄로 교체) */}
+        <div className="text-center text-xs text-gray-500 pb-1">
+          <p>Servus! 비엔나에서 전하는 좌충우돌 생존 기록 ☕</p>
         </div>
       </div>
     </header>
