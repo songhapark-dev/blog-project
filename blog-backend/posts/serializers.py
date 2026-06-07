@@ -5,13 +5,11 @@ from .models import Post, Category, Comment
 class CommentSerializer(serializers.ModelSerializer):
     """
     댓글 직렬화
-    - id, author, content, created_at만 필요
-    - post_id는 URL에서 받음
     """
     class Meta:
         model = Comment
         fields = ['id', 'author', 'content', 'created_at']
-        read_only_fields = ['id', 'created_at']  # 자동 생성되는 필드
+        read_only_fields = ['id', 'created_at']
 
 
 # 2. Category Serializer (카테고리)
@@ -19,14 +17,13 @@ class CategorySerializer(serializers.ModelSerializer):
     """
     카테고리 직렬화
     """
-    posts_count = serializers.SerializerMethodField()  # 커스텀 필드
+    posts_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Category
         fields = ['id', 'name', 'slug', 'posts_count']
     
     def get_posts_count(self, obj):
-        """이 카테고리의 게시글 개수"""
         return obj.posts.count()
 
 
@@ -34,8 +31,6 @@ class CategorySerializer(serializers.ModelSerializer):
 class PostListSerializer(serializers.ModelSerializer):
     """
     게시글 목록용 (메인페이지, 검색 결과)
-    - 제목, 카테고리, 생성일, 조회수만 표시
-    - 본문요약 포함
     """
     category_name = serializers.CharField(source='category.name', read_only=True)
     
@@ -45,20 +40,19 @@ class PostListSerializer(serializers.ModelSerializer):
             'id', 
             'title', 
             'content',      
-            'image',
+            'image', # 👈 메인용엔 원래 잘 들어있었습니다!
             'category', 
             'category_name',
             'created_at', 
             'view_count'
         ]
-        read_only_fields = fields  # 모두 읽기 전용
+        read_only_fields = fields
 
 
 # 4. Post Detail Serializer (게시글 상세 - 모든 정보)
 class PostDetailSerializer(serializers.ModelSerializer):
     """
     게시글 상세용 (상세페이지)
-    - 모든 정보 + 댓글 포함
     """
     comments = CommentSerializer(many=True, read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
@@ -69,6 +63,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'content',
+            'image', # 1. 여기에 'image' 필드를 정식으로 추가합니다!
             'category',
             'category_name',
             'created_at',
@@ -78,6 +73,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             'id',
+            'image', # 2. 읽기 전용 목록에도 image를 추가해 줍니다.
             'created_at',
             'updated_at',
             'view_count',
