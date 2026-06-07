@@ -62,13 +62,21 @@ function PostDetail() {
         </div>
       </header>
 
-      {/* 2. 대표 썸네일 이미지 (이미지가 있을 때만 노출) */}
+      {/* src/pages/PostDetail.jsx 의 이미지 렌더링 영역 수정 */}
       {post.image && (
-        <div className="w-full max-h-[450px] overflow-hidden rounded-xl mb-8 shadow-sm">
+        <div className="w-full max-h-[450px] overflow-hidden rounded-xl mb-8 shadow-sm bg-gray-50">
           <img 
-            src={post.image.startsWith('http') ? post.image : `${BACKEND_URL}${post.image}`} 
+            src={
+              post.image.startsWith('http') 
+                ? post.image 
+                : `${BACKEND_URL}${post.image.startsWith('/') ? post.image : '/' + post.image}`
+            } // 슬래시(/)가 있든 없든 무조건 완벽한 주소로 결합하는 치트키 로직!
             alt={post.title} 
             className="w-full h-full object-cover"
+            onError={(e) => {
+              // 혹시라도 이미지 로드 실패 시 무한 루프 방지 및 콘솔에 범인 주소 찍기
+              console.error("상세페이지 이미지 로드 실패 주소:", e.target.src);
+            }}
           />
         </div>
       )}
