@@ -12,7 +12,7 @@ function PostDetail() {
 
   useEffect(() => {
     // 백엔드로부터 상세 게시글 데이터 가져오기
-    axios.get(`${BACKEND_URL}/api/posts/${id}/`)
+    axios.get(`${BACKEND_URL}/posts/${id}/`)
       .then((res) => {
         setPost(res.data);
         setLoading(false);
