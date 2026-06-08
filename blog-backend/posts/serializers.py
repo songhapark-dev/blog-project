@@ -40,7 +40,7 @@ class PostListSerializer(serializers.ModelSerializer):
             'id', 
             'title', 
             'content',      
-            'image', # 👈 메인용엔 원래 잘 들어있었습니다!
+            'image', 
             'category', 
             'category_name',
             'created_at', 
@@ -63,7 +63,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'content',
-            'image', # 1. 여기에 'image' 필드를 정식으로 추가합니다!
+            'image', 
             'category',
             'category_name',
             'created_at',
@@ -73,7 +73,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             'id',
-            'image', # 2. 읽기 전용 목록에도 image를 추가해 줍니다.
+            'image', 
             'created_at',
             'updated_at',
             'view_count',

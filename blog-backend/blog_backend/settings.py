@@ -169,3 +169,14 @@ if os.environ.get('RENDER_EXTERNAL_URL'):
 # 업로드된 사진(Media)이 저장되고 서빙되는 경로 설정
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# 2. Cloudinary 연동 키 설정
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
+}
+
+# 3. 미디어 파일 저장소로 Cloudinary 지정
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
