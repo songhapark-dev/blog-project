@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useCategories } from '../hooks/useCategories';
 import { fetchPosts } from '../utils/api';
 import CategoryGrid from '../components/CategoryGrid';
