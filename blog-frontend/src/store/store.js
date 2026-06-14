@@ -17,7 +17,7 @@ export const useStore = create((set) => ({
   error: null,
   setError: (error) => set({ error }),
 
-  // 🔐 추가: 인증(Auth) 관련 상태 및 함수
+  // 추가: 인증(Auth) 관련 상태 및 함수
   // 브라우저 로컬스토리지에 기존 토큰이 있는지 확인하여 초기화합니다.
   token: localStorage.getItem('token') || null,
   isAuthenticated: !!localStorage.getItem('token'),

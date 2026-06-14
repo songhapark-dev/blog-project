@@ -40,26 +40,42 @@ function WritePage() {
       .catch(err => console.error('카테고리 로드 실패', err));
   }, [isAuthenticated, navigate]);
 
-  // 핵심: 이미지 드래그 앤 드롭 및 붙여넣기 가공 파이프라인
+  // 이미지 드래그 앤 드롭 및 붙여넣기 가공 파이프라인 (보강본)
   const handleImageUpload = async (file) => {
+    // 만약 카테고리가 아직 선택되지 않았다면 첫 번째 카테고리 ID 강제 지정 또는 방어
+    const categoryId = selectedCategory || (categories[0] ? categories[0].id : '');
+    
+    if (!categoryId) {
+      alert('카테고리가 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return 'https://via.placeholder.com/150';
+    }
+
     const formData = new FormData();
     formData.append('image', file);
-    formData.append('title', `inline_img_${Date.now()}`); // 임시 제목 할당
-    formData.append('category', selectedCategory);
+    formData.append('category', categoryId); // 🎯 확실한 ID 값 주입
+
+    // 장고 시리얼라이저 유효성 검사 통과용 더미 데이터 매핑 (필수 필드 방어막)
+    formData.append('title_ko', `inline_img_${Date.now()}`);
+    formData.append('content_ko', 'inline_image_holder');
+    formData.append('title_de', '');
+    formData.append('content_de', '');
+    formData.append('title_en', '');
+    formData.append('content_en', '');
 
     try {
-      // 본문 작성 중 이미지를 넣으면 즉시 백엔드를 거쳐 Cloudinary 영구 주소를 받아옵니다.
       const response = await axios.post(`${BACKEND_URL}/posts/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`, // 마스터 키 첨부
         },
       });
-      // 성공 시 반환된 영구 이미지 URL을 에디터 본문에 주입합니다.
+      
+      // 장고가 리턴해준 JSON 데이터 중 이미지 URL 추출
+      // 백엔드 시리얼라이저 반환 규격에 따라 response.data.image 또는 response.data.file 일 수 있습니다.
       return response.data.image; 
     } catch (err) {
-      console.error('본문 이미지 업로드 실패:', err);
-      alert('이미지 업로드에 실패했습니다.');
+      console.error('본문 이미지 업로드 실패:', err.response?.data || err); // 💡 콘솔에 장고가 보낸 진짜 에러 이유 출력
+      alert('이미지 업로드 형식 오류가 발생했습니다.');
       return 'https://via.placeholder.com/150';
     }
   };
