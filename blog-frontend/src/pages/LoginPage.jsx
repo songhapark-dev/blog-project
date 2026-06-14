@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuthStore } from '../store/store';
+import { useStore } from '../store/store';
 
 function LoginPage() {
   const [username, setUsername] = useState('');
