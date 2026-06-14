@@ -28,14 +28,22 @@ function WritePage() {
     if (!isAuthenticated) {
       alert('관리자 권한이 필요합니다. 🔒');
       navigate('/login');
+      return;
     }
     
     // 카테고리 목록 불러오기
     axios.get(`${BACKEND_URL}/categories/`)
       .then(res => {
+        // 장고 페이지네이션 포장을 뜯고 데이터 낚아채기
         const data = res.data.results || res.data;
+        console.log("로드된 카테고리 원본 데이터:", data); // 검증용 로그
+        
         setCategories(data);
-        if (data.length > 0) setSelectedCategory(data[0].id);
+        
+        // 핵심 보강: 데이터가 존재한다면 비동기 지연 없이 그 즉시 첫 번째 ID를 강제 주입!
+        if (data && data.length > 0) {
+          setSelectedCategory(data[0].id);
+        }
       })
       .catch(err => console.error('카테고리 로드 실패', err));
   }, [isAuthenticated, navigate]);
@@ -52,7 +60,7 @@ function WritePage() {
 
     const formData = new FormData();
     formData.append('image', file);
-    formData.append('category', categoryId); // 🎯 확실한 ID 값 주입
+    formData.append('category', categoryId); // 확실한 ID 값 주입
 
     // 장고 시리얼라이저 유효성 검사 통과용 더미 데이터 매핑 (필수 필드 방어막)
     formData.append('title_ko', `inline_img_${Date.now()}`);
@@ -71,10 +79,9 @@ function WritePage() {
       });
       
       // 장고가 리턴해준 JSON 데이터 중 이미지 URL 추출
-      // 백엔드 시리얼라이저 반환 규격에 따라 response.data.image 또는 response.data.file 일 수 있습니다.
       return response.data.image; 
     } catch (err) {
-      console.error('본문 이미지 업로드 실패:', err.response?.data || err); // 💡 콘솔에 장고가 보낸 진짜 에러 이유 출력
+      console.error('본문 이미지 업로드 실패:', err.response?.data || err); // 콘솔에 장고가 보낸 진짜 에러 이유 출력
       alert('이미지 업로드 형식 오류가 발생했습니다.');
       return 'https://via.placeholder.com/150';
     }
@@ -83,7 +90,9 @@ function WritePage() {
   // 발행하기 버튼 클릭 이벤트
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!titles.ko.strip() && !titles.de.strip() && !titles.en.strip()) {
+    
+    // 자바스크립트 표준 문법인 .trim()으로 수정하여 오타 에러 방지
+    if (!titles.ko.trim() && !titles.de.trim() && !titles.en.trim()) {
       alert('최소 한 개 언어 이상의 제목은 입력해야 합니다!');
       return;
     }
@@ -161,7 +170,7 @@ function WritePage() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">메인 커버 썸네일</label>
+            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Ref 파일 테스트</label>
             <input
               type="file"
               accept="image/*"
@@ -195,7 +204,7 @@ function WritePage() {
             style={{ height: '500px', borderRadius: '12px' }}
             renderHTML={(text) => <div className="prose max-w-none p-3">{text}</div>}
             onChange={({ text }) => setContents({ ...contents, [activeTab]: text })}
-            onImageUpload={handleImageUpload} // 👈 드래그앤드롭 파이프라인 탑재!
+            onImageUpload={handleImageUpload}
             placeholder="여기에 글을 작성하고 사진을 드래그하여 쏙쏙 집어넣으세요. 실시간으로 영구 저장 주소로 자동 인식됩니다."
           />
         </div>
