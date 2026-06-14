@@ -48,19 +48,35 @@ function WritePage() {
       .catch(err => console.error('카테고리 로드 실패', err));
   }, [isAuthenticated, navigate]);
 
-  // 이미지 드래그 앤 드롭 및 붙여넣기 가공 파이프라인 (보강본)
+  // 이미지 드래그 앤 드롭 및 붙여넣기 가공 파이프라인 (타이밍 동기화 완벽 보강)
   const handleImageUpload = async (file) => {
-    // 만약 카테고리가 아직 선택되지 않았다면 첫 번째 카테고리 ID 강제 지정 또는 방어
-    const categoryId = selectedCategory || (categories[0] ? categories[0].id : '');
     
+    // [1순위] 만약 selectedCategory가 비어있다면, 현재 로드된 categories 배열의 첫 번째 항목 ID를 강제로 낚아챕니다.
+    let categoryId = selectedCategory;
+    
+    if (!categoryId && categories && categories.length > 0) {
+      categoryId = categories[0].id;
+    }
+    
+    // [2순위] 만약 그것조차 없다면 화면의 select 엘리먼트에서 날것의 value를 직접 추출하는 최후의 수단을 씁니다.
     if (!categoryId) {
-      alert('카테고리가 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      const selectElement = document.querySelector('select');
+      if (selectElement && selectElement.value) {
+        categoryId = selectElement.value;
+      }
+    }
+
+    console.log("이미지 업로드 직전 최종 판정된 카테고리 ID:", categoryId);
+
+    // 3중 방어벽을 쳤는데도 데이터가 아예 없다면 그때서야 경고를 띄웁니다.
+    if (!categoryId) {
+      alert('카테고리 데이터를 동기화 중입니다. 1초만 기다린 후 다시 이미지를 드롭해주세요!');
       return 'https://via.placeholder.com/150';
     }
 
     const formData = new FormData();
     formData.append('image', file);
-    formData.append('category', categoryId); // 확실한 ID 값 주입
+    formData.append('category', categoryId); // 확실하게 구출해낸 정수형 ID 주입
 
     // 장고 시리얼라이저 유효성 검사 통과용 더미 데이터 매핑 (필수 필드 방어막)
     formData.append('title_ko', `inline_img_${Date.now()}`);
@@ -69,6 +85,7 @@ function WritePage() {
     formData.append('content_de', '');
     formData.append('title_en', '');
     formData.append('content_en', '');
+    
 
     try {
       const response = await axios.post(`${BACKEND_URL}/posts/`, formData, {
@@ -105,12 +122,12 @@ function WritePage() {
     if (thumbnail) formData.append('image', thumbnail); // 메인 썸네일
 
     // 3개 국어 필드 분할 적재
-    formData.append('title_ko', titles.ko);
-    formData.append('title_de', titles.de);
-    formData.append('title_en', titles.en);
-    formData.append('content_ko', contents.ko);
-    formData.append('content_de', contents.de);
-    formData.append('content_en', contents.en);
+    formData.append('title_ko', titles.ko || '');
+    formData.append('content_ko', contents.ko || '');
+    formData.append('title_de', titles.de || '');
+    formData.append('content_de', contents.de || '');
+    formData.append('title_en', titles.en || '');
+    formData.append('content_en', contents.en || '');
 
     try {
       await axios.post(`${BACKEND_URL}/posts/`, formData, {
