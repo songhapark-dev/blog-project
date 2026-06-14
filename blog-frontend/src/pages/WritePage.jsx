@@ -31,7 +31,7 @@ function WritePage() {
     }
     
     // 카테고리 목록 불러오기
-    axios.get(`${BACKEND_URL}/posts/categories/`)
+    axios.get(`${BACKEND_URL}/api/categories/`)
       .then(res => {
         const data = res.data.results || res.data;
         setCategories(data);
@@ -49,7 +49,7 @@ function WritePage() {
 
     try {
       // 본문 작성 중 이미지를 넣으면 즉시 백엔드를 거쳐 Cloudinary 영구 주소를 받아옵니다.
-      const response = await axios.post(`${BACKEND_URL}/posts/`, formData, {
+      const response = await axios.post(`${BACKEND_URL}/api/posts/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`, // 마스터 키 첨부
@@ -88,7 +88,7 @@ function WritePage() {
     formData.append('content_en', contents.en);
 
     try {
-      await axios.post(`${BACKEND_URL}/posts/`, formData, {
+      await axios.post(`${BACKEND_URL}/api/posts/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
