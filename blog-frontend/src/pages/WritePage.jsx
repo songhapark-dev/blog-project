@@ -90,17 +90,21 @@ function WritePage() {
     
 
     try {
-      const response = await axios.post(`${BACKEND_URL}/posts/`, formData, {
+      // 주소 조립 오차가 없도록 완전히 깨끗한 고정 주소로 타격합니다.
+      const response = await axios.post('https://blog-backend-35eq.onrender.com/posts/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`, // 마스터 키 첨부
+          'Authorization': `Bearer ${token}`
         },
       });
       
-      // 장고가 리턴해준 JSON 데이터 중 이미지 URL 추출
-      return response.data.image; 
+      console.log("장고 회신 원본 전체 데이터:", response.data);
+      
+      // 장고 PostViewSet 성공 시 반환 규격 (image 필드 추출)
+      return response.data.image || response.data.file || 'https://via.placeholder.com/150'; 
     } catch (err) {
-      console.error('본문 이미지 업로드 실패:', err.response?.data || err); // 콘솔에 장고가 보낸 진짜 에러 이유 출력
+      // 장고가 뱉은 진짜 에러 객체 내용을 상세히 뜯어봅니다.
+      console.error('장고가 거절한 상세 이유:', err.response?.data);
       alert('이미지 업로드 형식 오류가 발생했습니다.');
       return 'https://via.placeholder.com/150';
     }
