@@ -23,8 +23,12 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-t!mlp5e-b@)37_#ij3t60
 # Render 배포 서버 환경('RENDER' 환경 변수 존재)에서는 자동으로 False가 됩니다.
 DEBUG = 'RENDER' not in os.environ
 
-# 로컬 개발 환경 호스트 등록
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# 수정: 내 백엔드 도메인
+ALLOWED_HOSTS = [
+    'localhost', 
+    '127.0.0.1', 
+    'blog-backend-35eq.onrender.com' # 배포 도메인 직접 추가
+]
 
 
 # Application definition
@@ -35,7 +39,13 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    
+    # 클라우디너리는 반드시 staticfiles 바로 위에 이 순서대로!
+    "cloudinary_storage",
+    "cloudinary",
+    
     "django.contrib.staticfiles",
+    
     # 서드파티 및 커스텀 앱들
     'rest_framework',
     'corsheaders',
