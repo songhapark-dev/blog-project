@@ -1,6 +1,10 @@
 import os
 from django.contrib import admin
 from django.urls import path, include, re_path
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
@@ -9,7 +13,12 @@ urlpatterns = [
     path("admin/", admin.site.urls),  # 관리자 페이지 연결
     path("", include("posts.urls")),  # 루트 주소로 들어오면 posts 앱의 urls.py로 토스!
     #path('api/', include('posts.urls')),
-] 
+    # 추가: 리액트가 이 주소로 ID/PW를 보내면 검증 후 토큰 열쇠를 뱉어줍니다.
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    # 토큰 만료 시 갱신 요청을 보낼 주소
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+]
+
    
 # 개발 및 배포 환경에서 미디어 파일을 서빙할 수 있도록 설정 추가
 if settings.DEBUG:
