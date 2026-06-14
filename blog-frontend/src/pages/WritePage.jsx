@@ -76,9 +76,11 @@ function WritePage() {
 
     const formData = new FormData();
     formData.append('image', file);
-    formData.append('category', categoryId); // 확실하게 구출해낸 정수형 ID 주입
+    formData.append('category', categoryId);
 
-    // 장고 시리얼라이저 유효성 검사 통과용 더미 데이터 매핑 (필수 필드 방어막)
+    // 장고 시리얼라이저의 기본 필드와 번역 필드 유효성 검사를 동시에 프리패스하는 무적의 조합
+    formData.append('title', `inline_img_${Date.now()}`);
+    formData.append('content', 'inline_image_holder');
     formData.append('title_ko', `inline_img_${Date.now()}`);
     formData.append('content_ko', 'inline_image_holder');
     formData.append('title_de', '');
