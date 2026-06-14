@@ -3,7 +3,8 @@ import Header from './components/Header';
 import MainPage from './pages/MainPage';
 import About from './pages/About';
 import PostDetail from './pages/PostDetail';
-import CategoryPage from './pages/CategoryPage'; // 새로 만들 컴포넌트
+import CategoryPage from './pages/CategoryPage'; 
+import LoginPage from './pages/LoginPage'; // 1. 로그인 페이지 컴포넌트 임포트 추가!
 
 function App() {
   return (
@@ -21,8 +22,12 @@ function App() {
 
             {/* 게시글 상세 페이지 라우트 추가! (:id는 유동적인 숫자 ID를 뜻함) */}
             <Route path="/posts/:id" element={<PostDetail />} />
+            
             {/* 카테고리별 페이지 라우트 추가 */}
             <Route path="/category/:categoryId" element={<CategoryPage />} />
+
+            {/* 2. 관리자 로그인 페이지 비밀 선로 개설! */}
+            <Route path="/login" element={<LoginPage />} />
           </Routes>
         </main>
       </div>
