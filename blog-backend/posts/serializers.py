@@ -38,8 +38,10 @@ class PostListSerializer(serializers.ModelSerializer):
         model = Post
         fields = [
             'id', 
-            'title', 
-            'content',      
+            # 메인 대문에서도 언어별 제목/본문 조회가 가능하도록 필드 개방
+            'title_ko', 'content_ko',
+            'title_de', 'content_de',
+            'title_en', 'content_en',     
             'image', 
             'category', 
             'category_name',
@@ -49,10 +51,10 @@ class PostListSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-# 4. Post Detail Serializer (게시글 상세 - 모든 정보)
+# 4. Post Detail Serializer (게시글 상세 및 생성 - 모든 정보)
 class PostDetailSerializer(serializers.ModelSerializer):
     """
-    게시글 상세용 (상세페이지)
+    게시글 상세 및 작성/수정용
     """
     comments = CommentSerializer(many=True, read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
@@ -61,8 +63,10 @@ class PostDetailSerializer(serializers.ModelSerializer):
         model = Post
         fields = [
             'id',
-            'title',
-            'content',
+            # 장고 modeltranslation이 바라보는 실제 3개 국어 물리 필드 전면 등록!
+            'title_ko', 'content_ko',
+            'title_de', 'content_de',
+            'title_en', 'content_en',
             'image', 
             'category',
             'category_name',
@@ -71,9 +75,10 @@ class PostDetailSerializer(serializers.ModelSerializer):
             'view_count',
             'comments'
         ]
+        # 중요: 이미지 업로드(생성) 시점에 image 필드를 채워야 하므로 
+        # read_only_fields 목록에서 'image'를 과감히 제거하여 쓰기 권한을 부여합니다!
         read_only_fields = [
             'id',
-            'image', 
             'created_at',
             'updated_at',
             'view_count',
