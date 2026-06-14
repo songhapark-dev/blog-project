@@ -5,6 +5,7 @@ import About from './pages/About';
 import PostDetail from './pages/PostDetail';
 import CategoryPage from './pages/CategoryPage'; 
 import LoginPage from './pages/LoginPage'; // 1. 로그인 페이지 컴포넌트 임포트 추가!
+import WritePage from './pages/WritePage';
 
 function App() {
   return (
@@ -28,6 +29,8 @@ function App() {
 
             {/* 2. 관리자 로그인 페이지 비밀 선로 개설! */}
             <Route path="/login" element={<LoginPage />} />
+            {/* 3. 글쓰기 비밀통로 개설 */} 
+            <Route path="/write" element={<WritePage />} />
           </Routes>
         </main>
       </div>
