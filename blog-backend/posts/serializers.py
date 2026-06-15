@@ -44,6 +44,7 @@ class PostListSerializer(serializers.ModelSerializer):
 class PostDetailSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
+    image = serializers.ImageField(use_url=True)
     
     class Meta:
         model = Post

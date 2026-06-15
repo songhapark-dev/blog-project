@@ -179,10 +179,18 @@ function WritePage() {
           <MdEditor
             value={content}
             style={{ height: '600px', borderRadius: '12px' }}
-            renderHTML={(text) => <div className="prose max-w-none p-3">{text}</div>}
+            // 날것의 텍스트를 마크다운 이미지/링크 규격에 맞게 뼈대를 깎아주는 무적의 정규식 파서 장착
+            renderHTML={(text) => {
+              let html = text
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') // 기본 보안 처리
+                .replace(/\!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-xl my-4 shadow-md" />') // 이미지 변환 핵심
+                .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="text-blue-600 underline">$1</a>') // 일반 링크 변환
+                .replace(/\n/g, '<br />'); // 줄바꿈 반영
+              return <div className="prose max-w-none p-4" dangerouslySetInnerHTML={{ __html: html }} />;
+            }}
             onChange={({ text }) => setContent(text)}
             onImageUpload={handleImageUpload}
-            placeholder="여기에 글을 자유롭게 마크다운으로 작성하세요. 이미지 파일을 드래그 앤 드롭하면 Cloudinary 영구 주소로 실시간 자동 변환됩니다."
+            placeholder="여기에 글을 자유롭게 마크다운으로 작성하세요. 이미지 파일을 드래그 앤 ド롭하면 실시간으로 자동 변환됩니다."
           />
         </div>
 
