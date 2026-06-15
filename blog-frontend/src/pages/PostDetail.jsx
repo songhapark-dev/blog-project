@@ -2,6 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useStore } from '../store/store'; // Zustand 금고 연동
+// [추가] 상세 보기용 마크다운 파서 외부 선언
+import MarkdownIt from 'markdown-it';
+
+const mdParser = new MarkdownIt({
+  html: true,        
+  linkify: true,     
+  breaks: true,      
+});
 
 function PostDetail() {
   const { id } = useParams(); 
@@ -68,17 +76,6 @@ function PostDetail() {
     );
   }
 
-  // 마크다운 본문을 깨끗한 HTML 실물(이미지 태그 포함)로 가공하는 미니 파서 엔진
-  const renderMarkdownToHtml = (text) => {
-    if (!text) return '';
-    let html = text
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') // 기본 보안 처리
-      .replace(/\!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-xl my-5 shadow-md mx-auto block" />') // 본문 내 드롭된 이미지 실물 복원
-      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="text-blue-600 underline">$1</a>') // 일반 링크
-      .replace(/\n/g, '<br />'); // 줄바꿈 반영
-    return { __html: html };
-  };
-
   return (
     <article className="max-w-3xl mx-auto px-4 py-8 bg-white rounded-2xl border border-gray-100 shadow-sm mt-4">
       {/* 1. 상단 메타 정보 (카테고리, 제목, 날짜) */}
@@ -102,13 +99,13 @@ function PostDetail() {
                 onClick={() => navigate(`/edit/${post.id}`)}
                 className="px-3 py-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 font-bold text-xs rounded-lg transition"
               >
-                ✏️ 수정하기
+                수정하기
               </button>
               <button
                 onClick={handleFieldDelete}
                 className="px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 font-bold text-xs rounded-lg transition"
               >
-                🗑️ 삭제
+                삭제
               </button>
             </div>
           )}
@@ -133,10 +130,10 @@ function PostDetail() {
         </div>
       )}
 
-      {/* 3. 본문 텍스트 영역 (개조 완료: 마크다운 문법을 리얼 이미지/텍스트 구조로 완벽 파싱) */}
+      {/* 3. 본문 텍스트 영역 (정석 개조 완료: 마크다운 문법 완벽 파싱 출력) */}
       <div 
         className="text-gray-800 text-base md:text-lg leading-relaxed space-y-4 font-normal break-words min-h-[200px] prose max-w-none"
-        dangerouslySetInnerHTML={renderMarkdownToHtml(post.content)}
+        dangerouslySetInnerHTML={{ __html: mdParser.render(post.content || '') }}
       />
 
       {/* 4. 하단 네비게이션 버튼 */}

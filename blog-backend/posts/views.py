@@ -1,3 +1,4 @@
+import os
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -91,7 +92,31 @@ class PostViewSet(viewsets.ModelViewSet):
         
         serializer = PostListSerializer(posts, many=True)
         return Response(serializer.data)
+    
+    # [버그 박멸 박스] 본문 내 드래그 앤 드롭 이미지 전용 격리 통로 개설
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def upload_image(self, request):
+        """
+        본문에 드롭된 이미지를 게시글로 생성하지 않고, 
+        Cloudinary에만 안전하게 업로드한 뒤 영구 주소만 리턴합니다.
+        """
+        image_file = request.FILES.get('image')
+        if not image_file:
+            return Response({'error': '이미지 파일이 누락되었습니다.'}, status=status.HTTP_400_BAD_REQUEST)
         
+        # 임시 가짜 Post 객체를 메모리에 만들되, save()를 안 해서 DB 적재를 차단합니다.
+        # 장고가 스토리지 파이프라인을 태워 Cloudinary 주소를 생성하게 만듭니다.
+        from django.core.files.storage import default_storage
+        filename = default_storage.save(f"blog_images/inline_{image_file.name}", image_file)
+        image_url = default_storage.url(filename)
+        
+        # 렌더 환경에 맞게 깔끔한 절대 주소 반환 구조 보장
+        if not image_url.startswith('http'):
+            # 배포 환경 변수가 있다면 도메인을 붙여주고 없으면 상대경로 리턴
+            render_url = os.environ.get('RENDER_EXTERNAL_URL', '')
+            image_url = f"{render_url}{image_url}"
+
+        return Response({'image': image_url}, status=status.HTTP_200_OK)    
 
 
 # 3. Comment ViewSet (댓글)

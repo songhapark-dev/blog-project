@@ -4,6 +4,13 @@ import axios from 'axios';
 import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css'; // 에디터 기본 스타일 적용
 import { useStore } from '../store/store';
+import MarkdownIt from 'markdown-it';
+
+const mdParser = new MarkdownIt({
+  html: false,
+  linkify: true,
+  breaks: true,
+});
 
 function WritePage() {
   const navigate = useNavigate();
@@ -44,50 +51,32 @@ function WritePage() {
       .catch(err => console.error('카테고리 로드 실패', err));
   }, [isAuthenticated, navigate]);
 
-  // 본문 이미지 드래그 앤 드롭 업로드 파이프라인
+  // [버그 박멸 완료] 본문 이미지 드롭 시 유령 게시글이 생성되는 것을 완벽히 차단하는 새 파이프라인
   const handleImageUpload = async (file) => {
-    let categoryId = selectedCategory;
-    
-    if (!categoryId && categories && categories.length > 0) {
-      categoryId = categories[0].id;
-    }
-    
-    if (!categoryId) {
-      const selectElement = document.querySelector('select');
-      if (selectElement && selectElement.value) {
-        categoryId = selectElement.value;
-      }
-    }
-
-    if (!categoryId) {
-      alert('카테고리 데이터를 동기화 중입니다. 잠시 후 다시 시도해주세요.');
-      return 'https://via.placeholder.com/150';
-    }
+    if (!file) return 'https://via.placeholder.com/150';
 
     const formData = new FormData();
-    formData.append('image', file);
-    formData.append('category', categoryId);
-
-    // [롤백 완료] 장고 시리얼라이저 단일 필드 규격에 완벽 매칭 (더미 번역 필드 제거)
-    formData.append('title', `inline_img_${Date.now()}`);
-    formData.append('content', 'inline_image_holder');
+    formData.append('image', file); // 오직 이미지 알맹이만 전송
 
     try {
-      const response = await axios.post(`${BACKEND_URL}/posts/`, formData, {
+      // 🎯 격리 주소인 /posts/upload_image/ 로 정확히 타격합니다.
+      const response = await axios.post(`${BACKEND_URL}/posts/upload_image/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
         },
       });
       
-      // 장고 PostViewSet 성공 시 반환되는 Cloudinary 이미지 주소 주입
-      return response.data.image || response.data.file || 'https://via.placeholder.com/150'; 
+      // 백엔드가 새로 개설한 upload_image 액션에서 반환하는 Cloudinary 절대 주소 반환
+      return response.data.image || 'https://via.placeholder.com/150'; 
     } catch (err) {
-      console.error('본문 이미지 업로드 실패:', err.response?.data || err);
+      console.error('본문 이미지 격리 업로드 실패:', err.response?.data || err);
       alert('이미지 업로드에 실패했습니다.');
       return 'https://via.placeholder.com/150';
     }
   };
+
+    
 
   // 발행하기 버튼 클릭 이벤트
   const handleSubmit = async (e) => {
@@ -96,6 +85,11 @@ function WritePage() {
     if (!title.trim()) {
       alert('제목을 입력해주세요!');
       return;
+    }
+
+    if (!selectedCategory) {
+    alert('카테고리를 선택해주세요!');
+    return;
     }
 
     setLoading(true);
@@ -179,18 +173,16 @@ function WritePage() {
           <MdEditor
             value={content}
             style={{ height: '600px', borderRadius: '12px' }}
-            // 날것의 텍스트를 마크다운 이미지/링크 규격에 맞게 뼈대를 깎아주는 무적의 정규식 파서 장착
-            renderHTML={(text) => {
-              let html = text
-                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') // 기본 보안 처리
-                .replace(/\!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-xl my-4 shadow-md" />') // 이미지 변환 핵심
-                .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="text-blue-600 underline">$1</a>') // 일반 링크 변환
-                .replace(/\n/g, '<br />'); // 줄바꿈 반영
-              return <div className="prose max-w-none p-4" dangerouslySetInnerHTML={{ __html: html }} />;
-            }}
+            // 정석 마크다운 엔진에게 렌더링을 전적으로 위임합니다.
+            renderHTML={(text) => (
+              <div 
+                className="prose max-w-none p-4 font-normal text-gray-800" 
+                dangerouslySetInnerHTML={{ __html: mdParser.render(text) }} 
+              />
+            )}
             onChange={({ text }) => setContent(text)}
             onImageUpload={handleImageUpload}
-            placeholder="여기에 글을 자유롭게 마크다운으로 작성하세요. 이미지 파일을 드래그 앤 ド롭하면 실시간으로 자동 변환됩니다."
+            placeholder="여기에 글을 자유롭게 마크다운으로 작성하세요."
           />
         </div>
 

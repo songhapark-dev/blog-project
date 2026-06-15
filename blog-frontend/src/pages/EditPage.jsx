@@ -4,6 +4,13 @@ import axios from 'axios';
 import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css'; 
 import { useStore } from '../store/store';
+// [추가] 정석 마크다운 파서 외부 선언
+import MarkdownIt from 'markdown-it';
+const mdParser = new MarkdownIt({
+  html: true,        
+  linkify: true,     
+  breaks: true,      
+});
 
 function EditPage() {
   const { id } = useParams(); // URL 주소창에서 수정할 글의 ID 추출
@@ -195,14 +202,13 @@ function EditPage() {
           <MdEditor
             value={content}
             style={{ height: '600px', borderRadius: '12px' }}
-            renderHTML={(text) => {
-              let html = text
-                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-                .replace(/\!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-xl my-4 shadow-md mx-auto block" />')
-                .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="text-blue-600 underline">$1</a>')
-                .replace(/\n/g, '<br />');
-              return <div className="prose max-w-none p-4" dangerouslySetInnerHTML={{ __html: html }} />;
-            }}
+            // 조잡한 정규식 대신 마크다운 정석 엔진 연동
+            renderHTML={(text) => (
+              <div 
+                className="prose max-w-none p-4 font-normal text-gray-800" 
+                dangerouslySetInnerHTML={{ __html: mdParser.render(text) }} 
+              />
+            )}
             onChange={({ text }) => setContent(text)}
             onImageUpload={handleImageUpload}
             placeholder="마크다운 양식에 맞게 내용을 가공하세요."

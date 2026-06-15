@@ -55,20 +55,18 @@ function Header() {
               소개
             </Link>
 
-            {/* 🎯 관리자 로그인 상태에 따른 가변형 메뉴 바인딩 */}
+            {/* 관리자 로그인 상태에 따른 가변형 메뉴 바인딩 */}
             {isAuthenticated ? (
               <>
                 <Link
                   to="/write"
-                  className="text-blue-600 hover:text-blue-800 font-semibold transition flex items-center gap-1"
-                >
-                  <span>✏️</span> 글쓰기
+                  className="text-blue-600 hover:text-blue-800 font-semibold transition"
+                >글쓰기
                 </Link>
                 <Link
                   to="/manage"
-                  className="text-purple-600 hover:text-purple-800 font-semibold transition flex items-center gap-1"
-                >
-                  <span>🛠️</span> 게시물 관리
+                  className="text-purple-600 hover:text-purple-800 font-semibold transition"
+                >게시물 관리
                 </Link>
                 <button
                   onClick={handleLogoutClick}
@@ -82,7 +80,7 @@ function Header() {
                 to="/login"
                 className="text-xs bg-gray-950 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg font-medium transition shadow-sm"
               >
-                로그인 🔐
+                로그인
               </Link>
             )}
           </nav>
