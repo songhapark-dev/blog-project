@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import { useStore } from '../store/store'; // Zustand 금고 연동
 
 function PostDetail() {
-  const { id } = useParams(); // URL에서 게시글 ID 추출
+  const { id } = useParams(); 
   const navigate = useNavigate();
+  
+  // Zustand에서 토큰과 로그인 권한 상태 낚아채기
+  const token = useStore((state) => state.token);
+  const isAuthenticated = useStore((state) => state.isAuthenticated);
+
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const BACKEND_URL = 'https://blog-backend-35eq.onrender.com';
 
   useEffect(() => {
-    // 백엔드로부터 상세 게시글 데이터 가져오기
     axios.get(`${BACKEND_URL}/posts/${id}/`)
       .then((res) => {
         setPost(res.data);
@@ -23,7 +28,24 @@ function PostDetail() {
       });
   }, [id]);
 
-  // 날짜 포맷팅 함수
+  // 현장 즉시 삭제(DELETE) 핸들러
+  const handleFieldDelete = async () => {
+    if (window.confirm(`⚠️ [위험] \n"${post.title}" \n이 에세이를 실전 서버에서 영구 삭제하시겠습니까?`)) {
+      try {
+        await axios.delete(`${BACKEND_URL}/posts/${id}/`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        alert('🗑️ 포스팅이 현장에서 즉시 완파되었습니다.');
+        navigate('/'); // 삭제 후 홈으로 튕겨내기
+      } catch (err) {
+        console.error('현장 삭제 에러:', err);
+        alert('삭제 권한이 없거나 백엔드 에러가 발생했습니다.');
+      }
+    }
+  };
+
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleDateString('ko-KR', options);
@@ -46,23 +68,54 @@ function PostDetail() {
     );
   }
 
+  // 마크다운 본문을 깨끗한 HTML 실물(이미지 태그 포함)로 가공하는 미니 파서 엔진
+  const renderMarkdownToHtml = (text) => {
+    if (!text) return '';
+    let html = text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') // 기본 보안 처리
+      .replace(/\!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-xl my-5 shadow-md mx-auto block" />') // 본문 내 드롭된 이미지 실물 복원
+      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="text-blue-600 underline">$1</a>') // 일반 링크
+      .replace(/\n/g, '<br />'); // 줄바꿈 반영
+    return { __html: html };
+  };
+
   return (
     <article className="max-w-3xl mx-auto px-4 py-8 bg-white rounded-2xl border border-gray-100 shadow-sm mt-4">
       {/* 1. 상단 메타 정보 (카테고리, 제목, 날짜) */}
-      <header className="mb-8 pb-6 border-b border-gray-100">
+      <header className="mb-6 pb-6 border-b border-gray-100">
         <span className="inline-block bg-red-100 text-red-800 text-xs font-bold px-3 py-1 rounded-full mb-3">
           {post.category_name || '일반'}
         </span>
         <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight mb-4 leading-tight">
           {post.title}
         </h1>
-        <div className="flex items-center text-sm text-gray-400 gap-4">
-          <span>📅 {formatDate(post.created_at)}</span>
-          <span>👁️ {post.view_count} views</span>
+        <div className="flex items-center justify-between text-sm text-gray-400">
+          <div className="flex gap-4">
+            <span>📅 {formatDate(post.created_at)}</span>
+            <span>👁️ {post.view_count} views</span>
+          </div>
+          
+          {/* 툴바 배치: 오직 마스터 키를 쥔 로그인된 소유자에게만 특별 통제 기어 노출 */}
+          {isAuthenticated && (
+            <div className="flex gap-2 animate-fade-in">
+              <button
+                onClick={() => navigate(`/edit/${post.id}`)}
+                className="px-3 py-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 font-bold text-xs rounded-lg transition"
+              >
+                ✏️ 수정하기
+              </button>
+              <button
+                onClick={handleFieldDelete}
+                className="px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 font-bold text-xs rounded-lg transition"
+              >
+                🗑️ 삭제
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
-      {/* src/pages/PostDetail.jsx 의 이미지 렌더링 영역 수정 */}
+      {/* 2. 대문 대표 이미지 영역 */}
       {post.image && (
         <div className="w-full max-h-[450px] overflow-hidden rounded-xl mb-8 shadow-sm bg-gray-50">
           <img 
@@ -70,21 +123,21 @@ function PostDetail() {
               post.image.startsWith('http') 
                 ? post.image 
                 : `${BACKEND_URL}${post.image.startsWith('/') ? post.image : '/' + post.image}`
-            } // 슬래시(/)가 있든 없든 무조건 완벽한 주소로 결합하는 치트키 로직!
+            } 
             alt={post.title} 
             className="w-full h-full object-cover"
             onError={(e) => {
-              // 혹시라도 이미지 로드 실패 시 무한 루프 방지 및 콘솔에 범인 주소 찍기
               console.error("상세페이지 이미지 로드 실패 주소:", e.target.src);
             }}
           />
         </div>
       )}
 
-      {/* 3. 본문 텍스트 영역 (white-space-pre-wrap으로 줄바꿈 보존) */}
-      <div className="text-gray-800 text-base md:text-lg leading-relaxed space-y-4 whitespace-pre-wrap font-normal break-words min-h-[200px]">
-        {post.content}
-      </div>
+      {/* 3. 본문 텍스트 영역 (개조 완료: 마크다운 문법을 리얼 이미지/텍스트 구조로 완벽 파싱) */}
+      <div 
+        className="text-gray-800 text-base md:text-lg leading-relaxed space-y-4 font-normal break-words min-h-[200px] prose max-w-none"
+        dangerouslySetInnerHTML={renderMarkdownToHtml(post.content)}
+      />
 
       {/* 4. 하단 네비게이션 버튼 */}
       <footer className="mt-12 pt-6 border-t border-gray-100 flex justify-between">
