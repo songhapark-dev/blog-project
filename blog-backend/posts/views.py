@@ -12,12 +12,12 @@ from .serializers import (
 )
 
 
-# 1. Category ViewSet (카테고리) - ModelViewSet으로 변경하여 관리기능 뚫기
+# 1. Category ViewSet (카테고리)
 class CategoryViewSet(viewsets.ModelViewSet):
     """
     엔드포인트:
-    - GET /posts/categories/        → 모든 카테고리 조회 (누구나)
-    - POST /posts/categories/       → 카테고리 생성 (오직 관리자만)
+    - GET /categories/        → 모든 카테고리 조회 (누구나)
+    - POST /categories/       → 카테고리 생성 (오직 관리자만)
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -39,11 +39,9 @@ class PostViewSet(viewsets.ModelViewSet):
     - PUT /posts/{id}/          → 글 수정 (오직 관리자만!)
     - DELETE /posts/{id}/       → 글 삭제 (오직 관리자만!)
     """
-    
     queryset = Post.objects.select_related('category').prefetch_related('comments')
     lookup_field = 'id'
 
-    
     # 핵심 보안 필터: 일반 조회와 조회수 증가, 검색은 전 세계 누구나 통과!
     # 그 외의 POST(글쓰기), PUT(수정), DELETE(삭제)는 오직 송하님의 JWT 토큰이 있어야만 통과!
     def get_permissions(self):
@@ -57,7 +55,6 @@ class PostViewSet(viewsets.ModelViewSet):
         - list, search: PostListSerializer (간단한 정보)
         - retrieve, create, update: PostDetailSerializer (모든 정보 및 생성/수정용)
         """
-        # 글을 새로 쓰거나(create) 수정할 때(update)도 본문 전체 내용이 필요하므로 Detail 버전을 사용합니다.
         if self.action in ['retrieve', 'create', 'update', 'partial_update']:
             return PostDetailSerializer
         return PostListSerializer
@@ -72,24 +69,17 @@ class PostViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def search(self, request):
         """
-        게시글 검색 엔드포인트
+        게시글 검색 엔드포인트 (단일 필드 검색 구조 유지)
         
-        요청: GET /api/posts/search/?q=django
+        요청: GET /posts/search/?q=django
         응답: [{ Post 객체들... }]
-        
-        검색 범위:
-        - 제목 (title)
-        - 본문 (content)
-        
-        예시:
-        http://localhost:8000/api/posts/search/?q=react
-        http://localhost:8000/api/posts/search/?q=독일어
         """
         query = request.query_params.get('q', '').strip()
         
         if not query:
             posts = Post.objects.all()
         else:
+            # [롤백 완료] 복잡한 언어별 분기 없이 단일 title과 content 내부를 시원하게 통합 검색합니다.
             posts = Post.objects.filter(
                 Q(title__icontains=query) | Q(content__icontains=query)
             )
@@ -104,13 +94,12 @@ class PostViewSet(viewsets.ModelViewSet):
         
 
 
-# 3. Comment ViewSet (댓글) - 🛠️ ModelViewSet으로 변경 (나중에 댓글 쓰기 기능을 위해 미리 선로 개설)
+# 3. Comment ViewSet (댓글)
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     lookup_field = 'id'
     
     def get_permissions(self):
-        # 댓글 조회는 누구나, 생성/수정/삭제는 오직 송하님(Admin)만 (추후 일반댓글 허용 시 수정 가능)
         if self.action in ['list', 'retrieve']:
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]

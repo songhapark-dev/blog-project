@@ -17,25 +17,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# Render 환경 변수가 있으면 사용하고, 없으면 로컬용 기본 키를 사용합니다.
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-t!mlp5e-b@)37_#ij3t60)92z*_+yzekmhn#!vyfszvfnc5e6e')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Render 배포 서버 환경('RENDER' 환경 변수 존재)에서는 자동으로 False가 됩니다.
 DEBUG = 'RENDER' not in os.environ
 
-# 수정: 내 백엔드 도메인
+# 내 백엔드 도메인
 ALLOWED_HOSTS = [
     'localhost', 
     '127.0.0.1', 
-    'blog-backend-35eq.onrender.com' # 배포 도메인 직접 추가
+    'blog-backend-35eq.onrender.com'
 ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    "modeltranslation",
+    # 💥 [롤백] 다언어 확장 패키지 "modeltranslation" 완벽 제거!
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -57,13 +55,14 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',                     # CORS 미들웨어 (최상단 유지)
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",               # ⭐️ 정적 파일 배포를 위한 WhiteNoise 추가
+    "whitenoise.middleware.WhiteNoiseMiddleware",               # 정적 파일 배포를 위한 WhiteNoise
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # 💥 [롤백] 다언어 감지 미들웨어(LocaleMiddleware)가 있던 자리를 깔끔하게 정리했습니다.
 ]
 
 ROOT_URLCONF = "blog_backend.urls"
@@ -96,7 +95,7 @@ DATABASES = {
     }
 }
 
-# ⭐️ Render 호스팅 환경일 경우 PostgreSQL 데이터베이스로 전환합니다.
+# Render 호스팅 환경일 경우 PostgreSQL 데이터베이스로 전환합니다.
 if os.environ.get('DATABASE_URL'):
     DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
@@ -123,19 +122,14 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = "ko" # 기본 시스템 언어
+LANGUAGE_CODE = "ko-kr" # 깔끔하게 단일 한글 사양으로 명시
 
-TIME_ZONE = "Europe/Vienna" # 비엔나 시간대로 변경 
+TIME_ZONE = "Europe/Vienna" # 비엔나 시간대 유지
 
 USE_I18N = True
 USE_TZ = True
 
-# 지원할 3개 국어 명시 (한국어, 독일어, 영어)
-LANGUAGES = [
-    ('ko', 'Korean'),
-    ('de', 'German'),
-    ('en', 'English'),
-]
+# [롤백] 3개 국어를 명시하던 LANGUAGES 변수를 통째로 제거하여 단일 언어로 원상복구했습니다.
 
 
 # Static files (CSS, JavaScript, Images)
@@ -143,7 +137,7 @@ LANGUAGES = [
 
 STATIC_URL = "static/"
 
-# ⭐️ 배포 환경용 정적 파일 모음 경로 설정 (WhiteNoise 연동)
+# 배포 환경용 정적 파일 모음 경로 설정 (WhiteNoise 연동)
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -160,7 +154,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",   # 대체 포트
     "http://127.0.0.1:5173",
     "http://127.0.0.1:3000",
-    "https://songhaparkpharm.uk",       # 내 도메인 추가 (www 없는 버전)
+    "https://songhaparkpharm.uk",       # 내 도메인
     "https://www.songhaparkpharm.uk",
 ]
 
@@ -170,44 +164,40 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
     
-    # 추가: API 요청이 들어왔을 때 JWT 토큰 열쇠를 검사하는 감시관을 세웁니다.
+    # API 요청이 들어왔을 때 JWT 토큰 열쇠를 검사하는 감시관
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
 
 
-#  Render 배포 환경에서의 호스트 도메인 자동 허용 및 확장 설정
+# Render 배포 환경에서의 호스트 도메인 자동 허용 및 확장 설정
 if os.environ.get('RENDER_EXTERNAL_URL'):
     RENDER_EXTERNAL_URL = os.environ.get('RENDER_EXTERNAL_URL')
     
-    # 배포된 장고 백엔드 서버 자체의 도메인을 ALLOWED_HOSTS에 추가
     backend_domain = RENDER_EXTERNAL_URL.replace('https://', '').replace('http://', '')
     ALLOWED_HOSTS.append(backend_domain)
-    
-    # 프론트엔드가 배포되면 아래 배포용 CORS 설정 영역에 프론트엔드 도메인을 추가해주면 됩니다.
-    # 예시: CORS_ALLOWED_ORIGINS.append("https://your-react-app.onrender.com")
 
 
 # 업로드된 사진(Media)이 저장되고 서빙되는 경로 설정
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# 2. Cloudinary 연동 키 설정
+# Cloudinary 연동 키 설정
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET')
 }
 
-# 3. 미디어 파일 저장소로 Cloudinary 지정
+# 미디어 파일 저장소로 Cloudinary 지정
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # JWT 토큰 관련 설정
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # 글 쓰다가 끊기지 않게 넉넉히 1일 부여
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7), # 재발급 토큰은 7일 유지
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7), 
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
-    'AUTH_HEADER_TYPES': ('Bearer',),            # 리액트에서 보낼 때 헤더 형식 (Bearer 토큰값)
+    'AUTH_HEADER_TYPES': ('Bearer',),            
 }
