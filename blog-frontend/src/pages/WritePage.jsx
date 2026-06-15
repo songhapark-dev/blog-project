@@ -10,10 +10,9 @@ function WritePage() {
   const token = useStore((state) => state.token);
   const isAuthenticated = useStore((state) => state.isAuthenticated);
 
-  // 언어별 작성 폼 데이터 상태 관리
-  const [activeTab, setActiveTab] = useState('ko'); // 'ko', 'de', 'en'
-  const [titles, setTitles] = useState({ ko: '', de: '', en: '' });
-  const [contents, setContents] = useState({ ko: '', de: '', en: '' });
+  // [롤백 완료] 번역 객체 상태를 걷어내고 직관적인 문자열 상태로 단일화
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
 
   // 카테고리 및 썸네일 정보
   const [categories, setCategories] = useState([]);
@@ -34,13 +33,10 @@ function WritePage() {
     // 카테고리 목록 불러오기
     axios.get(`${BACKEND_URL}/categories/`)
       .then(res => {
-        // 장고 페이지네이션 포장을 뜯고 데이터 낚아채기
         const data = res.data.results || res.data;
-        console.log("로드된 카테고리 원본 데이터:", data); // 검증용 로그
-        
         setCategories(data);
         
-        // 핵심 보강: 데이터가 존재한다면 비동기 지연 없이 그 즉시 첫 번째 ID를 강제 주입!
+        // 데이터가 존재한다면 그 즉시 첫 번째 ID를 기본 카테고리로 주입
         if (data && data.length > 0) {
           setSelectedCategory(data[0].id);
         }
@@ -48,17 +44,14 @@ function WritePage() {
       .catch(err => console.error('카테고리 로드 실패', err));
   }, [isAuthenticated, navigate]);
 
-  // 이미지 드래그 앤 드롭 및 붙여넣기 가공 파이프라인 (타이밍 동기화 완벽 보강)
+  // 본문 이미지 드래그 앤 드롭 업로드 파이프라인
   const handleImageUpload = async (file) => {
-    
-    // [1순위] 만약 selectedCategory가 비어있다면, 현재 로드된 categories 배열의 첫 번째 항목 ID를 강제로 낚아챕니다.
     let categoryId = selectedCategory;
     
     if (!categoryId && categories && categories.length > 0) {
       categoryId = categories[0].id;
     }
     
-    // [2순위] 만약 그것조차 없다면 화면의 select 엘리먼트에서 날것의 value를 직접 추출하는 최후의 수단을 씁니다.
     if (!categoryId) {
       const selectElement = document.querySelector('select');
       if (selectElement && selectElement.value) {
@@ -66,11 +59,8 @@ function WritePage() {
       }
     }
 
-    console.log("이미지 업로드 직전 최종 판정된 카테고리 ID:", categoryId);
-
-    // 3중 방어벽을 쳤는데도 데이터가 아예 없다면 그때서야 경고를 띄웁니다.
     if (!categoryId) {
-      alert('카테고리 데이터를 동기화 중입니다. 1초만 기다린 후 다시 이미지를 드롭해주세요!');
+      alert('카테고리 데이터를 동기화 중입니다. 잠시 후 다시 시도해주세요.');
       return 'https://via.placeholder.com/150';
     }
 
@@ -78,34 +68,23 @@ function WritePage() {
     formData.append('image', file);
     formData.append('category', categoryId);
 
-    // 장고 시리얼라이저의 기본 필드와 번역 필드 유효성 검사를 동시에 프리패스하는 무적의 조합
+    // [롤백 완료] 장고 시리얼라이저 단일 필드 규격에 완벽 매칭 (더미 번역 필드 제거)
     formData.append('title', `inline_img_${Date.now()}`);
     formData.append('content', 'inline_image_holder');
-    formData.append('title_ko', `inline_img_${Date.now()}`);
-    formData.append('content_ko', 'inline_image_holder');
-    formData.append('title_de', '');
-    formData.append('content_de', '');
-    formData.append('title_en', '');
-    formData.append('content_en', '');
-    
 
     try {
-      // 주소 조립 오차가 없도록 완전히 깨끗한 고정 주소로 타격합니다.
-      const response = await axios.post('https://blog-backend-35eq.onrender.com/posts/', formData, {
+      const response = await axios.post(`${BACKEND_URL}/posts/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
         },
       });
       
-      console.log("장고 회신 원본 전체 데이터:", response.data);
-      
-      // 장고 PostViewSet 성공 시 반환 규격 (image 필드 추출)
+      // 장고 PostViewSet 성공 시 반환되는 Cloudinary 이미지 주소 주입
       return response.data.image || response.data.file || 'https://via.placeholder.com/150'; 
     } catch (err) {
-      // 장고가 뱉은 진짜 에러 객체 내용을 상세히 뜯어봅니다.
-      console.error('장고가 거절한 상세 이유:', err.response?.data);
-      alert('이미지 업로드 형식 오류가 발생했습니다.');
+      console.error('본문 이미지 업로드 실패:', err.response?.data || err);
+      alert('이미지 업로드에 실패했습니다.');
       return 'https://via.placeholder.com/150';
     }
   };
@@ -114,35 +93,29 @@ function WritePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // 자바스크립트 표준 문법인 .trim()으로 수정하여 오타 에러 방지
-    if (!titles.ko.trim() && !titles.de.trim() && !titles.en.trim()) {
-      alert('최소 한 개 언어 이상의 제목은 입력해야 합니다!');
+    if (!title.trim()) {
+      alert('제목을 입력해주세요!');
       return;
     }
 
     setLoading(true);
 
-    // 장고 modeltranslation 규칙 맞춤형 JSON 덩어리 조립
     const formData = new FormData();
     formData.append('category', selectedCategory);
-    if (thumbnail) formData.append('image', thumbnail); // 메인 썸네일
+    if (thumbnail) formData.append('image', thumbnail); // 메인 대문용 썸네일 커버
 
-    // 3개 국어 필드 분할 적재
-    formData.append('title_ko', titles.ko || '');
-    formData.append('content_ko', contents.ko || '');
-    formData.append('title_de', titles.de || '');
-    formData.append('content_de', contents.de || '');
-    formData.append('title_en', titles.en || '');
-    formData.append('content_en', contents.en || '');
+    // [롤백 완료] 깨끗한 단일 데이터 전송
+    formData.append('title', title);
+    formData.append('content', content);
 
     try {
       await axios.post(`${BACKEND_URL}/posts/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
-      alert('🇩🇪 🇰🇷 🇺🇸 글로벌 포스팅 발행 완료!');
+      alert('📝 에세이 발행 완료!');
       navigate('/');
     } catch (err) {
       console.error('글 발행 실패:', err);
@@ -156,27 +129,8 @@ function WritePage() {
     <div className="max-w-5xl mx-auto px-4 py-6 bg-white rounded-2xl border border-gray-100 shadow-xl">
       <div className="flex justify-between items-center border-b pb-4 mb-6">
         <h1 className="text-2xl font-extrabold text-gray-950 flex items-center gap-2">
-          <span>📝</span> 글로벌 신규 에세이 작성
+          <span>📝</span> 신규 마크다운 에세이 작성
         </h1>
-        {/* 언어 스위칭 멀티 탭 */}
-        <div className="flex gap-2 bg-gray-100 p-1 rounded-xl">
-          {[
-            { id: 'ko', label: '🇰🇷 한국어' },
-            { id: 'de', label: '🇩🇪 Deutsch' },
-            { id: 'en', label: '🇺🇸 English' }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 text-xs font-bold rounded-lg transition ${
-                activeTab === tab.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-700'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -193,7 +147,7 @@ function WritePage() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Ref 파일 테스트</label>
+            <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">메인 커버 썸네일</label>
             <input
               type="file"
               accept="image/*"
@@ -203,32 +157,32 @@ function WritePage() {
           </div>
         </div>
 
-        {/* 현재 활성화된 탭 언어의 제목 입력창 */}
+        {/* 단일 제목 입력창 */}
         <div>
           <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-            제목 ({activeTab.toUpperCase()})
+            제목
           </label>
           <input
             type="text"
-            value={titles[activeTab]}
-            onChange={(e) => setTitles({ ...titles, [activeTab]: e.target.value })}
-            placeholder={`${activeTab === 'de' ? 'Titel eingeben' : '제목을 입력하세요.'}`}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="제목을 입력하세요."
             className="w-full px-4 py-3 rounded-xl border border-gray-200 font-semibold focus:outline-none focus:border-red-500 text-base"
           />
         </div>
 
-        {/* 현재 활성화된 탭 언어의 마크다운 에디터 본문 */}
+        {/* 단일 마크다운 에디터 본문 */}
         <div>
           <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-            본문 마크다운 ({activeTab.toUpperCase()})
+            본문 마크다운
           </label>
           <MdEditor
-            value={contents[activeTab]}
-            style={{ height: '500px', borderRadius: '12px' }}
+            value={content}
+            style={{ height: '600px', borderRadius: '12px' }}
             renderHTML={(text) => <div className="prose max-w-none p-3">{text}</div>}
-            onChange={({ text }) => setContents({ ...contents, [activeTab]: text })}
+            onChange={({ text }) => setContent(text)}
             onImageUpload={handleImageUpload}
-            placeholder="여기에 글을 작성하고 사진을 드래그하여 쏙쏙 집어넣으세요. 실시간으로 영구 저장 주소로 자동 인식됩니다."
+            placeholder="여기에 글을 자유롭게 마크다운으로 작성하세요. 이미지 파일을 드래그 앤 드롭하면 Cloudinary 영구 주소로 실시간 자동 변환됩니다."
           />
         </div>
 
@@ -237,7 +191,7 @@ function WritePage() {
           disabled={loading}
           className="w-full py-4 bg-gray-950 text-white font-extrabold rounded-xl hover:bg-red-600 transition shadow-lg disabled:bg-gray-300"
         >
-          {loading ? '전 세계 서버로 원클릭 동시 발행 중...' : '🌍 글로벌 무대로 발행하기'}
+          {loading ? '서버로 안전하게 발행 중...' : '🚀 무대로 발행하기'}
         </button>
       </form>
     </div>
