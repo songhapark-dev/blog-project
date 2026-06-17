@@ -114,7 +114,7 @@ function MainPage() {
             </p>
 
             {/* 3. 심플 내비게이션 및 소셜 네트워크 트리오 */}
-            <div className="flex justify-center gap-5">
+            <div className="flex justify-center md:justify-start pt-3">
           {/* 1. 직관적인 편지봉투 메일 (호버 시 구글 레드 #EA4335) */}
           <a 
             href="mailto:songhapark.pharm@gmail.com"

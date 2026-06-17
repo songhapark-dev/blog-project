@@ -1,6 +1,7 @@
 import os
 from django.contrib import admin
 from django.urls import path, include, re_path
+from posts.views import trigger_cloudinary_migration
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -17,6 +18,7 @@ urlpatterns = [
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     # 토큰 만료 시 갱신 요청을 보낼 주소
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path('run-migrate/', trigger_cloudinary_migration, name='run_migrate'),
 ]
 
    

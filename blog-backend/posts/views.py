@@ -11,7 +11,9 @@ from .serializers import (
     CategorySerializer,
     CommentSerializer
 )
-
+from django.http import HttpResponse
+from django.contrib.admin.views.decorators import staff_member_required
+from django.core.management import call_command
 
 # 1. Category ViewSet (카테고리)
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -137,3 +139,12 @@ class CommentViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(post_id=post_id)
         
         return queryset
+    
+    @staff_member_required  # 어드민 로그인한 관리자만 접속 가능하게 제한
+    def trigger_cloudinary_migration(request):
+        try:
+            # 우리가 만들어둔 커스텀 명령어를 코드로 실행하는 장고 내장 함수입니다.
+            call_command('migrate_images_to_cloudinary')
+            return HttpResponse("🎉 Cloudinary 마이그레이션 성공적으로 완료!")
+        except Exception as e:
+            return HttpResponse(f"❌ 마이그레이션 실패: {e}", status=500)

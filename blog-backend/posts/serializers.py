@@ -21,9 +21,12 @@ class CategorySerializer(serializers.ModelSerializer):
         return obj.posts.count()
 
 
-# 3. Post List Serializer (게시글 목록 - 단일 언어 복구)
+# 3. Post List Serializer (게시글 목록 - 대문 엑박 방어막 장착)
 class PostListSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
+    
+    # 🎯 [추가] 목록에서도 이미지 유효성 검사 프리패스 설정
+    image = serializers.ImageField(required=False, allow_null=True)
     
     class Meta:
         model = Post
@@ -38,6 +41,13 @@ class PostListSerializer(serializers.ModelSerializer):
             'view_count'
         ]
         read_only_fields = fields
+
+    # 대문 엑박 박멸: 목록을 불러올 때도 무조건 Cloudinary 원본 절대 주소를 반환
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.image:
+            representation['image'] = instance.image.url
+        return representation
 
 
 # 4. Post Detail Serializer (게시글 상세 및 생성 - 단일 언어 복구)
@@ -68,6 +78,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
             'view_count',
             'comments'
         ]
+        
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         if instance.image:

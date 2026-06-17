@@ -33,7 +33,6 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    # 💥 [롤백] 다언어 확장 패키지 "modeltranslation" 완벽 제거!
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
