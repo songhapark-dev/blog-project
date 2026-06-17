@@ -38,14 +38,14 @@ function PostDetail() {
 
   // 현장 즉시 삭제(DELETE) 핸들러
   const handleFieldDelete = async () => {
-    if (window.confirm(`⚠️ [위험] \n"${post.title}" \n이 에세이를 실전 서버에서 영구 삭제하시겠습니까?`)) {
+    if (window.confirm(`⚠️ [위험] \n"${post.title}" \n이 에세이를 서버에서 영구 삭제하시겠습니까?`)) {
       try {
         await axios.delete(`${BACKEND_URL}/posts/${id}/`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        alert('🗑️ 포스팅이 현장에서 즉시 완파되었습니다.');
+        alert('포스팅이 삭제되었습니다.');
         navigate('/'); // 삭제 후 홈으로 튕겨내기
       } catch (err) {
         console.error('현장 삭제 에러:', err);

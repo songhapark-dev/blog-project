@@ -44,14 +44,14 @@ class PostListSerializer(serializers.ModelSerializer):
 class PostDetailSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
-    image = serializers.ImageField(use_url=True)
+    image = serializers.ImageField(required=False, allow_null=True)
     
     class Meta:
         model = Post
         fields = [
             'id',
-            'title',      # 3개 국어 파편화 필드 삭제 후 단일화
-            'content',    # 3개 국어 파편화 필드 삭제 후 단일화
+            'title',      
+            'content',    
             'image', 
             'category',
             'category_name',
@@ -68,3 +68,8 @@ class PostDetailSerializer(serializers.ModelSerializer):
             'view_count',
             'comments'
         ]
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if instance.image:
+            representation['image'] = instance.image.url
+        return representation
