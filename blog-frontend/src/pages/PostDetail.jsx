@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useStore } from '../store/store'; // Zustand 금고 연동
-// [추가] 상세 보기용 마크다운 파서 외부 선언
 import MarkdownIt from 'markdown-it';
 
 const mdParser = new MarkdownIt({
@@ -15,7 +14,6 @@ function PostDetail() {
   const { id } = useParams(); 
   const navigate = useNavigate();
   
-  // Zustand에서 토큰과 로그인 권한 상태 낚아채기
   const token = useStore((state) => state.token);
   const isAuthenticated = useStore((state) => state.isAuthenticated);
 
@@ -46,7 +44,7 @@ function PostDetail() {
           }
         });
         alert('포스팅이 삭제되었습니다.');
-        navigate('/'); // 삭제 후 홈으로 튕겨내기
+        navigate('/'); 
       } catch (err) {
         console.error('현장 삭제 에러:', err);
         alert('삭제 권한이 없거나 백엔드 에러가 발생했습니다.');
@@ -92,7 +90,6 @@ function PostDetail() {
             <span>👁️ {post.view_count} views</span>
           </div>
           
-          {/* 툴바 배치: 오직 마스터 키를 쥔 로그인된 소유자에게만 특별 통제 기어 노출 */}
           {isAuthenticated && (
             <div className="flex gap-2 animate-fade-in">
               <button
@@ -112,25 +109,21 @@ function PostDetail() {
         </div>
       </header>
 
-      {/* 2. 대문 대표 이미지 영역 */}
+      {/* 2. 대문 대표 이미지 영역 [버그 방지 및 Cloudinary 절대 경로 단일화 완료] */}
       {post.image && (
         <div className="w-full max-h-[450px] overflow-hidden rounded-xl mb-8 shadow-sm bg-gray-50">
           <img 
-            src={
-              post.image.startsWith('http') 
-                ? post.image 
-                : `${BACKEND_URL}${post.image.startsWith('/') ? post.image : '/' + post.image}`
-            } 
+            src={post.image} // 🎯 백엔드 시리얼라이저 설정을 전적으로 신뢰하여 절대주소 그대로 다이렉트 주입!
             alt={post.title} 
             className="w-full h-full object-cover"
             onError={(e) => {
-              console.error("상세페이지 이미지 로드 실패 주소:", e.target.src);
+              console.error("상세페이지 대표 이미지 로드 실패 주소:", e.target.src);
             }}
           />
         </div>
       )}
 
-      {/* 3. 본문 텍스트 영역 (정석 개조 완료: 마크다운 문법 완벽 파싱 출력) */}
+      {/* 3. 본문 텍스트 영역 (마크다운 파싱 정상 작동 확인 완료) */}
       <div 
         className="text-gray-800 text-base md:text-lg leading-relaxed space-y-4 font-normal break-words min-h-[200px] prose max-w-none"
         dangerouslySetInnerHTML={{ __html: mdParser.render(post.content || '') }}

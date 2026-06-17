@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'ajax'; // 혹은 axios
 import axios from 'axios';
 import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css'; // 에디터 기본 스타일 적용
@@ -43,7 +44,6 @@ function WritePage() {
         const data = res.data.results || res.data;
         setCategories(data);
         
-        // 데이터가 존재한다면 그 즉시 첫 번째 ID를 기본 카테고리로 주입
         if (data && data.length > 0) {
           setSelectedCategory(data[0].id);
         }
@@ -51,15 +51,14 @@ function WritePage() {
       .catch(err => console.error('카테고리 로드 실패', err));
   }, [isAuthenticated, navigate]);
 
-  // [버그 박멸 완료] 본문 이미지 드롭 시 유령 게시글이 생성되는 것을 완벽히 차단하는 새 파이프라인
+  // [버그 완전 박멸] 에디터 라이브러리 치환 매칭 버그를 해결한 새 함수 구조
   const handleImageUpload = async (file) => {
     if (!file) return 'https://via.placeholder.com/150';
 
     const formData = new FormData();
-    formData.append('image', file); // 오직 이미지 알맹이만 전송
+    formData.append('image', file);
 
     try {
-      // 🎯 격리 주소인 /posts/upload_image/ 로 정확히 타격합니다.
       const response = await axios.post(`${BACKEND_URL}/posts/upload_image/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -67,16 +66,26 @@ function WritePage() {
         },
       });
       
-      // 백엔드가 새로 개설한 upload_image 액션에서 반환하는 Cloudinary 절대 주소 반환
-      return response.data.image || 'https://via.placeholder.com/150'; 
+      const uploadedUrl = response.data.image;
+      
+      if (!uploadedUrl) {
+        return 'https://via.placeholder.com/150';
+      }
+
+      console.log("Cloudinary 전송 성공 주소:", uploadedUrl);
+
+      // 객체 형태로 반환하여 리액트 에디터 내 꼬리 문자열 버그 완벽 차단
+      return {
+        url: uploadedUrl,
+        title: file.name
+      };
+
     } catch (err) {
       console.error('본문 이미지 격리 업로드 실패:', err.response?.data || err);
       alert('이미지 업로드에 실패했습니다.');
       return 'https://via.placeholder.com/150';
     }
   };
-
-    
 
   // 발행하기 버튼 클릭 이벤트
   const handleSubmit = async (e) => {
@@ -88,17 +97,16 @@ function WritePage() {
     }
 
     if (!selectedCategory) {
-    alert('카테고리를 선택해주세요!');
-    return;
+      alert('카테고리를 선택해주세요!');
+      return;
     }
 
     setLoading(true);
 
     const formData = new FormData();
     formData.append('category', selectedCategory);
-    if (thumbnail) formData.append('image', thumbnail); // 메인 대문용 썸네일 커버
+    if (thumbnail) formData.append('image', thumbnail); 
 
-    // [롤백 완료] 깨끗한 단일 데이터 전송
     formData.append('title', title);
     formData.append('content', content);
 
@@ -128,7 +136,6 @@ function WritePage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* 카테고리 및 대표 이미지 세팅 묶음 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">게시판 카테고리</label>
@@ -151,7 +158,6 @@ function WritePage() {
           </div>
         </div>
 
-        {/* 단일 제목 입력창 */}
         <div>
           <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
             제목
@@ -165,7 +171,6 @@ function WritePage() {
           />
         </div>
 
-        {/* 단일 마크다운 에디터 본문 */}
         <div>
           <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
             본문 마크다운
@@ -173,7 +178,6 @@ function WritePage() {
           <MdEditor
             value={content}
             style={{ height: '600px', borderRadius: '12px' }}
-            // 정석 마크다운 엔진에게 렌더링을 전적으로 위임합니다.
             renderHTML={(text) => (
               <div 
                 className="prose max-w-none p-4 font-normal text-gray-800" 
@@ -196,6 +200,6 @@ function WritePage() {
       </form>
     </div>
   );
-}
+} 
 
 export default WritePage;

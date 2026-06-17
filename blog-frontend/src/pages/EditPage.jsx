@@ -4,8 +4,8 @@ import axios from 'axios';
 import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css'; 
 import { useStore } from '../store/store';
-// [추가] 정석 마크다운 파서 외부 선언
 import MarkdownIt from 'markdown-it';
+
 const mdParser = new MarkdownIt({
   html: true,        
   linkify: true,     
@@ -43,7 +43,6 @@ function EditPage() {
     const prepareData = async () => {
       try {
         setLoading(true);
-        // 카테고리 목록과 수정할 기존 글 데이터를 동시에 낚아챕니다.
         const [categoriesRes, postRes] = await Promise.all([
           axios.get(`${BACKEND_URL}/categories/`),
           axios.get(`${BACKEND_URL}/posts/${id}/`)
@@ -52,7 +51,6 @@ function EditPage() {
         const catData = categoriesRes.data.results || categoriesRes.data;
         setCategories(catData);
 
-        // 기존 글 데이터를 입력 폼에 싹 주입합니다.
         const currentPost = postRes.data;
         setTitle(currentPost.title || '');
         setContent(currentPost.content || '');
@@ -69,30 +67,38 @@ function EditPage() {
     prepareData();
   }, [id, isAuthenticated, navigate]);
 
-  // 2. 본문 이미지 실시간 드롭 업로드 파이프라인 (WritePage 검증본 완벽 이식)
+  // 2. [버그 완전 박멸] 본문 이미지 실시간 드롭 업로드 파이프라인 (정석 개조 완료)
   const handleImageUpload = async (file) => {
-    let categoryId = selectedCategory;
-    if (!categoryId && categories && categories.length > 0) {
-      categoryId = categories[0].id;
-    }
+    if (!file) return 'https://via.placeholder.com/150';
 
     const formData = new FormData();
-    formData.append('image', file);
-    formData.append('category', categoryId);
-    formData.append('title', `inline_img_${Date.now()}`);
-    formData.append('content', 'inline_image_holder');
+    formData.append('image', file); // 오직 이미지 알맹이만 전송
 
     try {
-      // 본문 이미지는 임시 Post로 생성하여 저장소 주소를 획득합니다.
-      const response = await axios.post(`${BACKEND_URL}/posts/`, formData, {
+      // 🎯 격리 주소인 /posts/upload_image/ 로 정확하게 타격하여 유령 게시글 생성을 완벽 차단합니다!
+      const response = await axios.post(`${BACKEND_URL}/posts/upload_image/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`
         },
       });
-      return response.data.image || response.data.file || 'https://via.placeholder.com/150'; 
+      
+      const uploadedUrl = response.data.image;
+      
+      if (!uploadedUrl) {
+        return 'https://via.placeholder.com/150';
+      }
+
+      console.log("Cloudinary 수정페이지 본문 전송 성공:", uploadedUrl);
+
+      // ★ 객체 형태로 반환하여 리액트 에디터 내 문자열 뒤틀림(0.jpeg) 버그를 완벽 차단합니다.
+      return {
+        url: uploadedUrl,
+        title: file.name
+      };
+
     } catch (err) {
-      console.error('본문 이미지 업로드 실패:', err.response?.data || err);
+      console.error('본문 이미지 격리 업로드 실패:', err.response?.data || err);
       alert('이미지 업로드에 실패했습니다.');
       return 'https://via.placeholder.com/150';
     }
@@ -114,13 +120,11 @@ function EditPage() {
     formData.append('title', title);
     formData.append('content', content);
     
-    // 만약 관리자가 썸네일 파일을 새로 갈아 끼웠을 때만 데이터 전송에 장착
     if (thumbnail) {
       formData.append('image', thumbnail);
     }
 
     try {
-      // 핵심: 새로 생성(POST)하는 것이 아니라 기존 글을 겨냥하여 갱신(PUT) 타격!
       await axios.put(`${BACKEND_URL}/posts/${id}/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -128,7 +132,7 @@ function EditPage() {
         },
       });
       alert('✏️ 에세이가 성공적으로 수정되었습니다!');
-      navigate(`/posts/${id}`); // 수정 완료 후 해당 글 상세 보기 페이지로 바로 이동
+      navigate(`/posts/${id}`); 
     } catch (err) {
       console.error('글 수정 반영 실패:', err.response?.data || err);
       alert('글 수정 권한이 없거나 백엔드 전송 오류가 발생했습니다.');
@@ -161,7 +165,6 @@ function EditPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* 카테고리 및 대표 이미지 변경 패널 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">게시판 카테고리 변경</label>
@@ -184,7 +187,6 @@ function EditPage() {
           </div>
         </div>
 
-        {/* 제목 입력창 */}
         <div>
           <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">제목</label>
           <input
@@ -196,13 +198,11 @@ function EditPage() {
           />
         </div>
 
-        {/* 마크다운 에디터 본문 (파서 장착 완비) */}
         <div>
           <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">본문 마크다운 수정</label>
           <MdEditor
             value={content}
             style={{ height: '600px', borderRadius: '12px' }}
-            // 조잡한 정규식 대신 마크다운 정석 엔진 연동
             renderHTML={(text) => (
               <div 
                 className="prose max-w-none p-4 font-normal text-gray-800" 
