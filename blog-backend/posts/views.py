@@ -1,4 +1,5 @@
 import os
+import cloudinary.uploader
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -26,7 +27,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     lookup_field = 'id'
 
-    # 권한 설정: 조회는 누구나, 생성/수정/삭제는 오직 송하님(Admin)만!
+    # 권한 설정: 조회는 누구나, 생성/수정/삭제는 오직 관리자만!
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [permissions.AllowAny()]
@@ -46,7 +47,7 @@ class PostViewSet(viewsets.ModelViewSet):
     lookup_field = 'id'
 
     # 핵심 보안 필터: 일반 조회와 조회수 증가, 검색은 전 세계 누구나 통과!
-    # 그 외의 POST(글쓰기), PUT(수정), DELETE(삭제)는 오직 송하님의 JWT 토큰이 있어야만 통과!
+    # 그 외의 POST(글쓰기), PUT(수정), DELETE(삭제)는 오직 관리자의 JWT 토큰이 있어야만 통과!
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'view', 'search']:
             return [permissions.AllowAny()]
@@ -82,7 +83,6 @@ class PostViewSet(viewsets.ModelViewSet):
         if not query:
             posts = Post.objects.all()
         else:
-            # [롤백 완료] 복잡한 언어별 분기 없이 단일 title과 content 내부를 시원하게 통합 검색합니다.
             posts = Post.objects.filter(
                 Q(title__icontains=query) | Q(content__icontains=query)
             )
@@ -100,25 +100,29 @@ class PostViewSet(viewsets.ModelViewSet):
     def upload_image(self, request):
         """
         본문에 드롭된 이미지를 게시글로 생성하지 않고, 
-        Cloudinary에만 안전하게 업로드한 뒤 영구 주소만 리턴합니다.
+        Cloudinary에 직접 업로드한 뒤 무조건 HTTPS 절대 주소만 리턴합니다.
         """
         image_file = request.FILES.get('image')
         if not image_file:
             return Response({'error': '이미지 파일이 누락되었습니다.'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # 임시 가짜 Post 객체를 메모리에 만들되, save()를 안 해서 DB 적재를 차단합니다.
-        # 장고가 스토리지 파이프라인을 태워 Cloudinary 주소를 생성하게 만듭니다.
-        from django.core.files.storage import default_storage
-        filename = default_storage.save(f"blog_images/inline_{image_file.name}", image_file)
-        image_url = default_storage.url(filename)
-        
-        # 렌더 환경에 맞게 깔끔한 절대 주소 반환 구조 보장
-        if not image_url.startswith('http'):
-            # 배포 환경 변수가 있다면 도메인을 붙여주고 없으면 상대경로 리턴
-            render_url = os.environ.get('RENDER_EXTERNAL_URL', '')
-            image_url = f"{render_url}{image_url}"
-
-        return Response({'image': image_url}, status=status.HTTP_200_OK)    
+        try:
+            # 장고의 내부 스토리지를 거치지 않고 Cloudinary API로 직접 업로드 
+            response = cloudinary.uploader.upload(
+                image_file,
+                folder="blog_images"
+            )
+            
+            # 클라우디네리가 발급한 보안 HTTPS 절대 경로 주소 추출
+            image_url = response.get('secure_url')
+            
+            if not image_url:
+                return Response({'error': 'Cloudinary로부터 URL을 받아오지 못했습니다.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
+            return Response({'image': image_url}, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({'error': f'이미지 업로드 중 실패: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # 3. Comment ViewSet (댓글)
@@ -140,6 +144,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         
         return queryset
     
+
+# 완전히 독립된 마이그레이션 트리거 뷰 (오타 수정 완료)
 @staff_member_required  # 어드민 로그인한 관리자만 접속 가능하게 제한
 def trigger_cloudinary_migration(request):
     try:
