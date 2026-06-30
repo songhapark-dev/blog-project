@@ -25,14 +25,35 @@ function ManagePage() {
   }, [isAuthenticated, navigate]);
 
   // 글 목록 새로고침 함수
+  // 개조 완료: 장고의 다음 페이지(next)가 없을 때까지 끝까지 추적해 전량 수집하는 파이프라인
   const fetchManagePosts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${BACKEND_URL}/posts/`);
-      const data = response.data.results || response.data;
-      setPosts(data);
+      
+      let allPosts = [];
+      let url = `${BACKEND_URL}/posts/`;
+
+      // 장고가 주는 다음 페이지 주소(res.data.next)가 null이 될 때까지 무한 추적
+      while (url) {
+        const res = await axios.get(url);
+        
+        // 데이터가 페이지네이션 배열(results) 구조인지, 아니면 쌩 배열인지 유연하게 방어막 처리
+        const currentBatch = res.data.results || res.data;
+        
+        if (Array.isArray(currentBatch)) {
+          allPosts = [...allPosts, ...currentBatch];
+        } else {
+          // 혹시 모를 예외 발생 시 무한 루프 방지를 위해 브레이크
+          break;
+        }
+
+        // 장고가 주는 다음 주소(ex: ?page=2)로 갱신, 다음 장이 없으면 null이 되어 루프 탈출!
+        url = res.data.next; 
+      }
+
+      setPosts(allPosts);
     } catch (err) {
-      console.error('관리자용 글 목록 로드 실패:', err);
+      console.error('관리자용 글 목록 전량 로드 실패:', err);
       alert('데이터를 불러오지 못했습니다.');
     } finally {
       setLoading(false);
