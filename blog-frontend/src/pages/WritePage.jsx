@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'ajax'; // 혹은 axios
+//import axios from 'ajax'; // 혹은 axios
 import axios from 'axios';
 import MdEditor from 'react-markdown-editor-lite';
 import 'react-markdown-editor-lite/lib/index.css'; // 에디터 기본 스타일 적용
