@@ -10,7 +10,7 @@ function MainPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 모든 게시글을 카테고리별로 그룹화 (새로운 fetchPosts 규격 반영)
+  // 모든 게시글을 카테고리별로 그룹화 (최종 방어막 장착)
   useEffect(() => {
     const fetchAllPosts = async () => {
       setLoading(true);
@@ -18,14 +18,17 @@ function MainPage() {
 
       try {
         const response = await fetchPosts();
-        // 🎯 개조된 api 규격에 맞춰 response.data 배열을 바로 할당합니다.
-        const allPosts = response.data;
+        
+        // 🎯 [수정] response.data 안에 한 번 더 들어있는 진짜 배열(.data)을 꺼내옵니다!
+        // 만약 구조가 쌩 배열로 바뀔 때를 대비해 || response.data 까지 안전하게 가드 처리합니다.
+        const allPosts = response.data.data || response.data;
 
         // 카테고리별로 게시글 그룹화
         const grouped = {};
         categories.forEach((category) => {
           grouped[category.id] = {
             name: category.name,
+            // 이제 allPosts가 확실한 배열이므로 .filter가 웅장하게 정상 작동합니다!
             posts: allPosts.filter((post) => post.category === category.id),
           };
         });
