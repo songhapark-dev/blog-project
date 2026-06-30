@@ -11,6 +11,7 @@ function MainPage() {
   const [error, setError] = useState(null);
 
   // 모든 게시글을 카테고리별로 그룹화 (최종 방어막 장착)
+  // 모든 게시글을 카테고리별로 그룹화 (어떤 데이터 규격이든 강제로 배열로 정제)
   useEffect(() => {
     const fetchAllPosts = async () => {
       setLoading(true);
@@ -19,24 +20,50 @@ function MainPage() {
       try {
         const response = await fetchPosts();
         
-        // 🎯 [수정] response.data 안에 한 번 더 들어있는 진짜 배열(.data)을 꺼내옵니다!
-        // 만약 구조가 쌩 배열로 바뀔 때를 대비해 || response.data 까지 안전하게 가드 처리합니다.
-        const allPosts = response.data.data || response.data;
+        // 🔍 디버깅용: 실제 데이터가 어떤 껍질에 싸여서 오는지 터미널/콘솔에 찍어봅니다.
+        console.log("🛠️ fetchPosts() 최종 반환 결과 원본:", response);
+
+        let finalArray = [];
+
+        // 1층: response 자체가 배열인 경우
+        if (Array.isArray(response)) {
+          finalArray = response;
+        } 
+        // 2층: axios 표준 껍질(response.data) 구조일 때
+        else if (response && response.data) {
+          if (Array.isArray(response.data)) {
+            finalArray = response.data;
+          } 
+          // 3층: custom 껍질(response.data.data) 구조일 때
+          else if (response.data.data && Array.isArray(response.data.data)) {
+            finalArray = response.data.data;
+          }
+          // 4층: 장고 오리지널 껍질(response.data.results) 구조일 때
+          else if (response.data.results && Array.isArray(response.data.results)) {
+            finalArray = response.data.results;
+          }
+        }
+
+        // 🚨 최종 안전장치: 모든 수단을 동원했는데도 배열이 아니라면 에러를 강제로 던집니다.
+        if (!Array.isArray(finalArray)) {
+          console.error("🚨 비상! 정제된 데이터가 배열이 아닙니다:", finalArray);
+          throw new TypeError("정제된 데이터가 배열 형식이 아닙니다.");
+        }
 
         // 카테고리별로 게시글 그룹화
         const grouped = {};
         categories.forEach((category) => {
           grouped[category.id] = {
             name: category.name,
-            // 이제 allPosts가 확실한 배열이므로 .filter가 웅장하게 정상 작동합니다!
-            posts: allPosts.filter((post) => post.category === category.id),
+            // 이제 finalArray는 100% 배열임이 보장되므로 절대 터지지 않습니다!
+            posts: finalArray.filter((post) => post.category === category.id),
           };
         });
 
         setPostsByCategory(grouped);
       } catch (err) {
         console.error('Error fetching posts:', err);
-        setError('게시글을 불러올 수 없습니다.');
+        setError('게시글을 불러올 수 없습니다. 콘솔의 에러 로그를 확인해 주세요.');
       } finally {
         setLoading(false);
       }
@@ -47,6 +74,7 @@ function MainPage() {
     }
   }, [categories]);
 
+  
   // 로딩 상태
   if (categoriesLoading || loading) {
     return (
