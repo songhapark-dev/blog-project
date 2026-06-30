@@ -12,6 +12,7 @@ function MainPage() {
 
   // 모든 게시글을 카테고리별로 그룹화 (최종 방어막 장착)
   // 모든 게시글을 카테고리별로 그룹화 (어떤 데이터 규격이든 강제로 배열로 정제)
+  // 모든 게시글을 카테고리별로 그룹화 (3층 레이어 객체 완벽 붕괴 로직)
   useEffect(() => {
     const fetchAllPosts = async () => {
       setLoading(true);
@@ -20,33 +21,37 @@ function MainPage() {
       try {
         const response = await fetchPosts();
         
-        // 🔍 디버깅용: 실제 데이터가 어떤 껍질에 싸여서 오는지 터미널/콘솔에 찍어봅니다.
         console.log("🛠️ fetchPosts() 최종 반환 결과 원본:", response);
 
         let finalArray = [];
 
-        // 1층: response 자체가 배열인 경우
-        if (Array.isArray(response)) {
-          finalArray = response;
-        } 
-        // 2층: axios 표준 껍질(response.data) 구조일 때
-        else if (response && response.data) {
-          if (Array.isArray(response.data)) {
+        //  콘솔에 찍힌 {data: {data: [...]}} 또는 {data: {results: [...]}} 구조 정밀 타격
+        if (response && response.data) {
+          // Case A: response.data.data 자체가 순수 배열인 경우 (우리가 원하던 3층 구조)
+          if (Array.isArray(response.data.data)) {
+            finalArray = response.data.data;
+          } 
+          // Case B: response.data 자체가 순수 배열인 경우
+          else if (Array.isArray(response.data)) {
             finalArray = response.data;
           } 
-          // 3층: custom 껍질(response.data.data) 구조일 때
-          else if (response.data.data && Array.isArray(response.data.data)) {
-            finalArray = response.data.data;
-          }
-          // 4층: 장고 오리지널 껍질(response.data.results) 구조일 때
+          // Case C: response.data.results가 배열인 경우
           else if (response.data.results && Array.isArray(response.data.results)) {
             finalArray = response.data.results;
           }
+          // Case D: 혹시 3층 구조 내부(response.data.data)에 results가 한 번 더 래핑된 경우
+          else if (response.data.data && response.data.data.results && Array.isArray(response.data.data.results)) {
+            finalArray = response.data.data.results;
+          }
+        } 
+        else if (Array.isArray(response)) {
+          finalArray = response;
         }
 
-        // 🚨 최종 안전장치: 모든 수단을 동원했는데도 배열이 아니라면 에러를 강제로 던집니다.
+        // 디버깅용: 최종 정제된 녀석이 배열이 맞는지, 몇 개가 들어왔는지 콘솔에 출력
+        console.log("✅ 최종 추출된 순수 게시글 배열:", finalArray, "개수:", finalArray.length);
+
         if (!Array.isArray(finalArray)) {
-          console.error("🚨 비상! 정제된 데이터가 배열이 아닙니다:", finalArray);
           throw new TypeError("정제된 데이터가 배열 형식이 아닙니다.");
         }
 
@@ -55,7 +60,6 @@ function MainPage() {
         categories.forEach((category) => {
           grouped[category.id] = {
             name: category.name,
-            // 이제 finalArray는 100% 배열임이 보장되므로 절대 터지지 않습니다!
             posts: finalArray.filter((post) => post.category === category.id),
           };
         });
@@ -74,7 +78,7 @@ function MainPage() {
     }
   }, [categories]);
 
-  
+
   // 로딩 상태
   if (categoriesLoading || loading) {
     return (
