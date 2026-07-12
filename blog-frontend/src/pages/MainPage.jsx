@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import { useCategories } from '../hooks/useCategories';
 import { fetchPosts } from '../utils/api';
 import CategoryGrid from '../components/CategoryGrid';
-import { BACKEND_URL } from '../utils/api';
 
 function MainPage() {
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
   const [postsByCategory, setPostsByCategory] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const BACKEND_URL = 'https://blog-backend-35eq.onrender.com';
 
   // Posts를 카테고리별로 그룹화하여 상태에 저장
   useEffect(() => {
