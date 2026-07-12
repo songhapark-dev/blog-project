@@ -46,11 +46,16 @@ function CategoryPage() {
           categoriesRes.data.results || categoriesRes.data;
 
         // 3. 전체 게시글 중 현재 카테고리에 해당하는 글만 필터링
-        const filteredPosts = allPosts.filter(
-          (post) => String(post.category) === String(categoryId)
-        );
+        const filteredPosts = allPosts.filter((post) => {
+          const postCategoryId =
+            typeof post.category === 'object'
+              ? post.category?.id
+              : post.category;
 
-        setPosts(filteredPosts);
+         return String(postCategoryId) === String(categoryId);
+        });
+
+        console.log('필터링된 글 개수:', filteredPosts.length);
 
         // 4. 현재 카테고리 이름 찾기
         const currentCategory = Array.isArray(allCategories)
