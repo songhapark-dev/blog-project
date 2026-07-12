@@ -14,25 +14,49 @@ function CategoryPage() {
   useEffect(() => {
     setLoading(true);
     
-    // 백엔드 필터 오류 방지: 전체 글과 카테고리명을 동시에 가져와서 프론트에서 정교하게 조립합니다.
     const fetchCategoryData = async () => {
       try {
-        const [postsRes, categoriesRes] = await Promise.all([
-          axios.get(`${BACKEND_URL}/posts/`),
-          axios.get(`${BACKEND_URL}/categories/`)
-        ]);
+        // --- 1. 글 목록 전량 수집 파이프라인 (while 루프 도입) ---
+        let allPosts = [];
+        let postsUrl = `${BACKEND_URL}/posts/`;
 
-        // 1. DRF 페이지네이션 껍데기(results) 방어막 대책
-        const allPosts = postsRes.data.results || postsRes.data;
-        const allCategories = categoriesRes.data.results || categoriesRes.data;
+        while (postsUrl) {
+          const res = await axios.get(postsUrl);
+          const currentBatch = res.data.results || res.data;
 
-        // 2. 현재 카테고리 ID와 일치하는 글들만 쏙쏙 골라내기 (String 변환 비교로 안전하게)
+          if (Array.isArray(currentBatch)) {
+            allPosts = [...allPosts, ...currentBatch];
+          } else {
+            break;
+          }
+          // 다음 페이지가 있으면 갱신, 없으면 null이 되어 탈출
+          postsUrl = res.data.next; 
+        }
+
+        // --- 2. 카테고리 목록 가져오기 ---
+        // (카테고리가 엄청 많아져서 페이지네이션이 걸릴 수도 있으니 똑같이 안전하게 처리합니다)
+        let allCategories = [];
+        let catUrl = `${BACKEND_URL}/categories/`;
+
+        while (catUrl) {
+          const res = await axios.get(catUrl);
+          const currentBatch = res.data.results || res.data;
+
+          if (Array.isArray(currentBatch)) {
+            allCategories = [...allCategories, ...currentBatch];
+          } else {
+            break;
+          }
+          catUrl = res.data.next;
+        }
+
+        // 3. 현재 카테고리 ID와 일치하는 글들만 쏙쏙 골라내기 (String 변환 비교)
         const filteredPosts = allPosts.filter(
           (post) => String(post.category) === String(categoryId)
         );
         setPosts(filteredPosts);
 
-        // 3. 글이 0개여도 백엔드 카테고리 목록에서 정확한 게시판 이름 찾아오기!
+        // 4. 글이 0개여도 백엔드 카테고리 목록에서 정확한 게시판 이름 찾아오기!
         const currentCategory = allCategories.find(
           (cat) => String(cat.id) === String(categoryId)
         );
@@ -58,7 +82,7 @@ function CategoryPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      {/* 상단 카테고리 헤더 타이틀 완벽 복구 */}
+      {/* 상단 카테고리 헤더 타이틀 */}
       <div className="border-b border-gray-100 pb-6 mb-10">
         <h1 className="text-3xl font-extrabold text-gray-950 flex items-center gap-2">
           <span className="text-red-500">#</span> {categoryName}
