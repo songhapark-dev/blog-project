@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useCategories } from '../hooks/useCategories';
 import { fetchPosts } from '../utils/api';
 import CategoryGrid from '../components/CategoryGrid';
+import { BACKEND_URL } from '../utils/api';
 
 function MainPage() {
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
@@ -10,74 +11,66 @@ function MainPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 모든 게시글을 카테고리별로 그룹화 (최종 방어막 장착)
-  // 모든 게시글을 카테고리별로 그룹화 (어떤 데이터 규격이든 강제로 배열로 정제)
-  // 모든 게시글을 카테고리별로 그룹화 (3층 레이어 객체 완벽 붕괴 로직)
+  // Posts를 카테고리별로 그룹화하여 상태에 저장
   useEffect(() => {
-    const fetchAllPosts = async () => {
-      setLoading(true);
-      setError(null);
+  const fetchAllPosts = async () => {
+    setLoading(true);
+    setError(null);
 
-      try {
-        const response = await fetchPosts();
-        
-        console.log("🛠️ fetchPosts() 최종 반환 결과 원본:", response);
+    try {
+      let allPosts = [];
+      let url = `${BACKEND_URL}/posts/`;
 
-        let finalArray = [];
+      while (url) {
+        const response = await fetch(url);
 
-        //  콘솔에 찍힌 {data: {data: [...]}} 또는 {data: {results: [...]}} 구조 정밀 타격
-        if (response && response.data) {
-          // Case A: response.data.data 자체가 순수 배열인 경우 (우리가 원하던 3층 구조)
-          if (Array.isArray(response.data.data)) {
-            finalArray = response.data.data;
-          } 
-          // Case B: response.data 자체가 순수 배열인 경우
-          else if (Array.isArray(response.data)) {
-            finalArray = response.data;
-          } 
-          // Case C: response.data.results가 배열인 경우
-          else if (response.data.results && Array.isArray(response.data.results)) {
-            finalArray = response.data.results;
-          }
-          // Case D: 혹시 3층 구조 내부(response.data.data)에 results가 한 번 더 래핑된 경우
-          else if (response.data.data && response.data.data.results && Array.isArray(response.data.data.results)) {
-            finalArray = response.data.data.results;
-          }
-        } 
-        else if (Array.isArray(response)) {
-          finalArray = response;
+        if (!response.ok) {
+          throw new Error(`게시글 요청 실패: ${response.status}`);
         }
 
-        // 디버깅용: 최종 정제된 녀석이 배열이 맞는지, 몇 개가 들어왔는지 콘솔에 출력
-        console.log("✅ 최종 추출된 순수 게시글 배열:", finalArray, "개수:", finalArray.length);
+        const data = await response.json();
 
-        if (!Array.isArray(finalArray)) {
-          throw new TypeError("정제된 데이터가 배열 형식이 아닙니다.");
-        }
+        const currentBatch = data.results || data;
 
-        // 카테고리별로 게시글 그룹화
-        const grouped = {};
-        categories.forEach((category) => {
-          grouped[category.id] = {
-            name: category.name,
-            posts: finalArray.filter((post) => post.category === category.id),
-          };
-        });
+        allPosts = [...allPosts, ...currentBatch];
 
-        setPostsByCategory(grouped);
-      } catch (err) {
-        console.error('Error fetching posts:', err);
-        setError('게시글을 불러올 수 없습니다. 콘솔의 에러 로그를 확인해 주세요.');
-      } finally {
-        setLoading(false);
+        url = data.next || null;
       }
-    };
 
-    if (categories.length > 0) {
-      fetchAllPosts();
+      console.log("✅ 전체 게시글 개수:", allPosts.length);
+      console.log("✅ 전체 게시글 데이터:", allPosts);
+
+      if (!Array.isArray(allPosts)) {
+        throw new TypeError("게시글 데이터가 배열 형식이 아닙니다.");
+      }
+
+      const grouped = {};
+
+      categories.forEach((category) => {
+        grouped[category.id] = {
+          name: category.name,
+          posts: allPosts.filter(
+            (post) => post.category === category.id
+          ),
+        };
+      });
+
+      setPostsByCategory(grouped);
+
+    } catch (err) {
+      console.error("Error fetching all posts:", err);
+      setError(
+        "게시글을 불러올 수 없습니다. 콘솔의 에러 로그를 확인해 주세요."
+      );
+    } finally {
+      setLoading(false);
     }
-  }, [categories]);
+  };
 
+  if (categories.length > 0) {
+    fetchAllPosts();
+  }
+}, [categories]);
 
   // 로딩 상태
   if (categoriesLoading || loading) {
