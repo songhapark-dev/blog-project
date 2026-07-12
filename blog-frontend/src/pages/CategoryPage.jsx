@@ -57,6 +57,8 @@ function CategoryPage() {
 
         console.log('필터링된 글 개수:', filteredPosts.length);
 
+        setPosts(filteredPosts);
+
         // 4. 현재 카테고리 이름 찾기
         const currentCategory = Array.isArray(allCategories)
           ? allCategories.find(
