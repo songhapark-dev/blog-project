@@ -51,7 +51,7 @@ function WritePage() {
       .catch(err => console.error('카테고리 로드 실패', err));
   }, [isAuthenticated, navigate]);
 
-  // [버그 완전 박멸] 에디터 라이브러리 치환 매칭 버그를 해결한 새 함수 구조
+  // Image Upload Handler: Cloudinary 전송 및 URL 반환
   const handleImageUpload = async (file) => {
     if (!file) return 'https://via.placeholder.com/150';
 
@@ -75,7 +75,7 @@ function WritePage() {
       console.log("Cloudinary 전송 성공 주소:", uploadedUrl);
 
       // 객체 형태로 반환하여 리액트 에디터 내 꼬리 문자열 버그 완벽 차단
-      return uploadedUrl;
+      return `![](${uploadedUrl})`;
 
     } catch (err) {
       console.error('본문 이미지 격리 업로드 실패:', err.response?.data || err);
