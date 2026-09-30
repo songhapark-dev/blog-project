@@ -73,8 +73,7 @@ function WritePage() {
       }
 
       console.log("Cloudinary 전송 성공 주소:", uploadedUrl);
-
-      // 객체 형태로 반환하여 리액트 에디터 내 꼬리 문자열 버그 완벽 차단
+      
       return uploadedUrl;
 
     } catch (err) {
