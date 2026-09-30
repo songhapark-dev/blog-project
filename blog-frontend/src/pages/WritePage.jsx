@@ -71,9 +71,10 @@ function WritePage() {
         return 'https://via.placeholder.com/150';
       }
 
-      console.log("Cloudinary 글쓰기 페이지 전송 성공 주소:", uploadedUrl);
-      
-    
+      console.log('🔥 RESPONSE DATA:', response.data);
+      console.log('🔥 UPLOADED URL:', uploadedUrl);
+      console.log('🔥 UPLOADED URL TYPE:', typeof uploadedUrl);
+
       return uploadedUrl;
 
     } catch (err) {
