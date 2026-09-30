@@ -67,7 +67,7 @@ function EditPage() {
     prepareData();
   }, [id, isAuthenticated, navigate]);
 
-  // 2. [버그 완전 박멸] 본문 이미지 실시간 드롭 업로드 파이프라인 (정석 개조 완료)
+  // Image Upload Handler: Cloudinary 전송 및 URL 반환
   const handleImageUpload = async (file) => {
     if (!file) return 'https://via.placeholder.com/150';
 
@@ -75,7 +75,6 @@ function EditPage() {
     formData.append('image', file); // 오직 이미지 알맹이만 전송
 
     try {
-      // 🎯 격리 주소인 /posts/upload_image/ 로 정확하게 타격하여 유령 게시글 생성을 완벽 차단합니다!
       const response = await axios.post(`${BACKEND_URL}/posts/upload_image/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -91,11 +90,7 @@ function EditPage() {
 
       console.log("Cloudinary 수정페이지 본문 전송 성공:", uploadedUrl);
 
-      // ★ 객체 형태로 반환하여 리액트 에디터 내 문자열 뒤틀림(0.jpeg) 버그를 완벽 차단합니다.
-      return {
-        url: uploadedUrl,
-        title: file.name
-      };
+      return uploadedUrl;
 
     } catch (err) {
       console.error('본문 이미지 격리 업로드 실패:', err.response?.data || err);
