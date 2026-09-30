@@ -74,6 +74,11 @@ function WritePage() {
 
       console.log("Cloudinary 전송 성공 주소:", uploadedUrl);
       
+      console.log("uploadedUrl:", uploadedUrl);
+      console.log("typeof uploadedUrl:", typeof uploadedUrl);
+      console.log("response.data:", response.data);
+      console.log("typeof response.data:", typeof response.data);
+      
       return uploadedUrl;
 
     } catch (err) {
