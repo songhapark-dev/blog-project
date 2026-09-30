@@ -37,9 +37,7 @@ function MainPage() {
 
         url = data.next || null;
       }
-
-      console.log("✅ 전체 게시글 개수:", allPosts.length);
-      console.log("✅ 전체 게시글 데이터:", allPosts);
+      
 
       if (!Array.isArray(allPosts)) {
         throw new TypeError("게시글 데이터가 배열 형식이 아닙니다.");

@@ -17,8 +17,7 @@ function WritePage() {
   const navigate = useNavigate();
   const token = useStore((state) => state.token);
   const isAuthenticated = useStore((state) => state.isAuthenticated);
-
-  // [롤백 완료] 번역 객체 상태를 걷어내고 직관적인 문자열 상태로 단일화
+  
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
