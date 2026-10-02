@@ -76,8 +76,8 @@ function Header() {
             src="/smile_icon.png"
             alt="Songha's Blog"
             className="
-              w-30
-              h-30
+              w-15
+              h-15
               object-contain
               shrink-0
             "

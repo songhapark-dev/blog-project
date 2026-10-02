@@ -56,7 +56,6 @@ class PostListSerializer(serializers.ModelSerializer):
 class PostDetailSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
-    image = serializers.SerializerMethodField() # 🎯 상세 페이지 대문 이미지 주소 강제 추출
     
     class Meta:
         model = Post
