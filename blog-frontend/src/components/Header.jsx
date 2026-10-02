@@ -76,8 +76,8 @@ function Header() {
             src="/smile_icon.png"
             alt="Songha's Blog"
             className="
-              w-12
-              h-12
+              w-30
+              h-30
               object-contain
               shrink-0
             "
@@ -283,28 +283,6 @@ function Header() {
 
         </div>
 
-        {/* Pixel frame details */}
-        <div
-          className="
-            absolute
-            top-0
-            left-0
-            w-2
-            h-2
-            bg-[#39ff14]
-          "
-        />
-
-        <div
-          className="
-            absolute
-            bottom-0
-            right-0
-            w-2
-            h-2
-            bg-[#8b4cff]
-          "
-        />
 
       </div>
     </header>
