@@ -68,34 +68,44 @@ function EditPage() {
   }, [id, isAuthenticated, navigate]);
 
   // Image Upload Handler: Cloudinary 전송 및 URL 반환
-  const handleImageUpload = async (file) => {
-    if (!file) return 'https://via.placeholder.com/150';
+  // Image Upload Handler: Cloudinary 전송 및 Markdown Editor에 URL 전달
+  const handleImageUpload = async (file, callback) => {
+    if (!file) return;
 
     const formData = new FormData();
-    formData.append('image', file); // 오직 이미지 알맹이만 전송
+    formData.append('image', file);
 
     try {
-      const response = await axios.post(`${BACKEND_URL}/posts/upload_image/`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
-        },
-      });
-      
+      const response = await axios.post(
+        `${BACKEND_URL}/posts/upload_image/`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
       const uploadedUrl = response.data.image;
-      
+
       if (!uploadedUrl) {
-        return 'https://via.placeholder.com/150';
+        throw new Error('업로드된 이미지 URL이 없습니다.');
       }
 
-      console.log("Cloudinary 수정페이지 본문 전송 성공:", uploadedUrl);
+      console.log('🔥 EDIT RESPONSE DATA:', response.data);
+      console.log('🔥 EDIT UPLOADED URL:', uploadedUrl);
+      console.log('🔥 EDIT UPLOADED URL TYPE:', typeof uploadedUrl);
 
-      return uploadedUrl;
+      // 업로드된 Cloudinary URL을 Markdown Editor에 전달
+      callback(uploadedUrl);
 
     } catch (err) {
-      console.error('본문 이미지 격리 업로드 실패:', err.response?.data || err);
+      console.error(
+        '수정 페이지 본문 이미지 업로드 실패:',
+        err.response?.data || err
+      );
       alert('이미지 업로드에 실패했습니다.');
-      return 'https://via.placeholder.com/150';
     }
   };
 

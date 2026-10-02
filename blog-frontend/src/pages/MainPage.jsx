@@ -131,13 +131,13 @@ function MainPage() {
                 Songha Park
               </h1>
               <span className="inline-block bg-red-50 text-red-600 text-[10px] font-extrabold px-2 py-0.5 rounded-md self-center">
-                Pharmacist & Developer
+                Pharmacist 
               </span>
             </div>
             
             <p className="text-sm md:text-base text-gray-600 leading-relaxed font-medium max-w-2xl">
-              아무 연고도 없는 비엔나에 떨어져 독일어, 직장, 코딩까지 <br className="hidden md:inline" />
-              0부터 다시 시작하며 사서 고생하는 6년차 한국 약사.
+              약사, 비엔나에서 독일어 공부중 <br className="hidden md:inline" />
+              심심해 죽겠어서 시작한 일상의 기록
             </p>
 
             {/* 3. 심플 내비게이션 및 소셜 네트워크 트리오 */}
