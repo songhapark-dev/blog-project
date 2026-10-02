@@ -5,13 +5,13 @@ import SearchBar from './SearchBar';
 function Header() {
   const navigate = useNavigate();
 
-  // Zustand
   const isAuthenticated = useStore((state) => state.isAuthenticated);
   const logout = useStore((state) => state.logout);
 
   const setSelectedCategory = useStore(
     (state) => state.setSelectedCategory
   );
+
   const setSearchQuery = useStore(
     (state) => state.setSearchQuery
   );
@@ -24,9 +24,9 @@ function Header() {
 
   const handleLogoutClick = () => {
     if (window.confirm('로그아웃 하시겠습니까?')) {
-      logout();
-      alert('안전하게 로그아웃 되었습니다. 🔐');
-      navigate('/');
+     logout();
+     alert('안전하게 로그아웃 되었습니다. 🔐');
+     navigate('/');
     }
   };
 
@@ -36,173 +36,275 @@ function Header() {
         sticky top-0 z-50
         bg-black
         border-b-2 border-[#39ff14]
-        shadow-[0_0_12px_rgba(57,255,20,0.35)]
+        shadow-[0_0_12px_rgba(57,255,20,0.3)]
       "
     >
+
+      {/* HEADER FRAME */}
       <div
         className="
+          relative
           w-full
-          px-5
+          px-6
           py-3
           flex
           items-center
-          gap-6
+          gap-8
+          overflow-hidden
         "
       >
 
-        {/* ─────────────────────
-            LOGO
-        ───────────────────── */}
+        {/* ─────────────────────────────
+            LEFT : LOGO
+        ───────────────────────────── */}
+
         <button
           onClick={handleLogoClick}
           className="
             flex
             items-center
-            gap-2
+            gap-3
             shrink-0
             bg-transparent
             border-none
-            text-[#39ff14]
-            font-mono
-            text-lg
-            font-bold
-            tracking-tight
-            hover:text-[#00aaff]
-            transition-colors
             focus:outline-none
           "
         >
+
+          {/* Smile Icon */}
           <img
             src="/smile_icon.png"
             alt="Songha's Blog"
             className="
-              w-8
-              h-8
+              w-12
+              h-12
               object-contain
               shrink-0
             "
           />
-          
 
-          <span>
-            Songha's Blog.exe
-          </span>
+          {/* Logo Text */}
+          <div className="flex flex-col items-start">
+
+            <div
+              className="
+                font-mono
+                text-2xl
+                font-bold
+                leading-none
+                tracking-tight
+                whitespace-nowrap
+              "
+            >
+              <span className="text-white">
+                Songha's Blog.
+              </span>
+
+              <span
+                className="
+                  text-[#39ff14]
+                  drop-shadow-[0_0_7px_rgba(57,255,20,0.8)]
+                "
+              >
+                exe
+              </span>
+            </div>
+
+            {/* Subtitle */}
+            <div
+              className="
+                mt-2
+                font-mono
+                text-[11px]
+                font-bold
+                tracking-[0.18em]
+                whitespace-nowrap
+              "
+            >
+              <span className="text-[#008cff]">
+                // VIENNA.
+              </span>{' '}
+
+              <span className="text-[#4b7cff]">
+                PHARMACY.
+              </span>{' '}
+
+              <span className="text-[#704cff]">
+                CODE.
+              </span>{' '}
+
+              <span className="text-[#a43cff]">
+                LIFE.
+              </span>
+            </div>
+
+          </div>
         </button>
 
 
-        {/* ─────────────────────
-            NAVIGATION
-        ───────────────────── */}
+        {/* ─────────────────────────────
+            CENTER : NAVIGATION
+        ───────────────────────────── */}
+
         <nav
           className="
             flex
             items-center
-            gap-5
+            gap-1
+            ml-6
             font-mono
-            text-sm
             font-bold
-            tracking-wide
           "
         >
+
+          {/* HOME */}
           <Link
             to="/"
             className="
+              px-4
+              py-2
+              text-sm
               text-[#39ff14]
-              hover:text-[#00aaff]
-              hover:drop-shadow-[0_0_6px_rgba(0,170,255,0.9)]
+              border border-transparent
+              hover:border-[#39ff14]
+              hover:bg-[#39ff14]/10
+              hover:shadow-[0_0_8px_rgba(57,255,20,0.35)]
               transition-all
             "
           >
             HOME
           </Link>
 
+
+          {/* ABOUT */}
           <Link
             to="/about"
             className="
-              text-[#00aaff]
-              hover:text-[#bf00ff]
-              hover:drop-shadow-[0_0_6px_rgba(191,0,255,0.9)]
+              px-4
+              py-2
+              text-sm
+              text-[#8b4cff]
+              border border-transparent
+              hover:border-[#8b4cff]
+              hover:bg-[#8b4cff]/10
+              hover:shadow-[0_0_8px_rgba(139,76,255,0.35)]
               transition-all
             "
           >
             ABOUT
           </Link>
 
-          {/* 로그인 상태일 때만 기존 기능 유지 */}
-          {isAuthenticated && (
-            <>
-              <Link
-                to="/write"
-                className="
-                  text-[#bf00ff]
-                  hover:text-[#39ff14]
-                  hover:drop-shadow-[0_0_6px_rgba(57,255,20,0.9)]
-                  transition-all
-                "
-              >
-                WRITE
-              </Link>
 
-              <Link
-                to="/manage"
-                className="
-                  text-[#39ff14]
-                  hover:text-[#bf00ff]
-                  hover:drop-shadow-[0_0_6px_rgba(191,0,255,0.9)]
-                  transition-all
-                "
-              >
-                MANAGE
-              </Link>
-            </>
+          {/* WRITE */}
+          {isAuthenticated && (
+            <Link
+              to="/write"
+              className="
+                px-4
+                py-2
+                text-sm
+                text-[#704cff]
+                border border-transparent
+                hover:border-[#704cff]
+                hover:bg-[#704cff]/10
+                hover:shadow-[0_0_8px_rgba(112,76,255,0.35)]
+                transition-all
+              "
+            >
+              WRITE
+            </Link>
           )}
+
+
+          {/* MANAGE */}
+          {isAuthenticated && (
+            <Link
+              to="/manage"
+              className="
+                px-4
+                py-2
+                text-sm
+                text-[#a43cff]
+                border border-transparent
+                hover:border-[#a43cff]
+                hover:bg-[#a43cff]/10
+                hover:shadow-[0_0_8px_rgba(164,60,255,0.35)]
+                transition-all
+              "
+            >
+              MANAGE
+            </Link>
+          )}
+
         </nav>
 
 
-        {/* ─────────────────────
-            SEARCH
-        ───────────────────── */}
-        <div className="ml-auto">
+        {/* RIGHT : AUTH + SEARCH */}
+
+        <div className="ml-auto flex items-center gap-4 shrink-0">
+
+          {/* LOGIN / LOGOUT */}
+          {isAuthenticated ? (
+            <button
+              onClick={handleLogoutClick}
+              className="
+                bg-transparent
+                border-none
+                p-0
+                font-mono
+                text-xs
+                font-bold
+                text-white
+                hover:text-[#39ff14]
+                transition-colors
+                focus:outline-none
+              "
+            >
+              LOGOUT
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="
+                font-mono
+                text-xs
+                font-bold
+                text-white
+                hover:text-[#39ff14]
+                transition-colors
+              "
+            >
+              LOGIN
+            </Link>
+          )}
+
+          {/* SEARCH */}
           <SearchBar />
+
         </div>
 
+        {/* Pixel frame details */}
+        <div
+          className="
+            absolute
+            top-0
+            left-0
+            w-2
+            h-2
+            bg-[#39ff14]
+          "
+        />
 
-        {/* ─────────────────────
-            AUTH
-            기존 기능 유지
-        ───────────────────── */}
-        {isAuthenticated ? (
-          <button
-            onClick={handleLogoutClick}
-            className="
-              shrink-0
-              text-[10px]
-              font-mono
-              font-bold
-              text-[#666]
-              hover:text-[#ff4444]
-              transition-colors
-            "
-            title="Logout"
-          >
-            LOGOUT
-          </button>
-        ) : (
-          <Link
-            to="/login"
-            className="
-              shrink-0
-              text-[10px]
-              font-mono
-              font-bold
-              text-[#666]
-              hover:text-[#bf00ff]
-              transition-colors
-            "
-          >
-            LOGIN
-          </Link>
-        )}
+        <div
+          className="
+            absolute
+            bottom-0
+            right-0
+            w-2
+            h-2
+            bg-[#8b4cff]
+          "
+        />
 
       </div>
     </header>
