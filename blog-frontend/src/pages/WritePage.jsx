@@ -51,36 +51,42 @@ function WritePage() {
   }, [isAuthenticated, navigate]);
 
   // Image Upload Handler: Cloudinary 전송 및 URL 반환
-  const handleImageUpload = async (file) => {
-    if (!file) return 'https://via.placeholder.com/150';
+  const handleImageUpload = async (file, callback) => {
+    if (!file) return;
 
     const formData = new FormData();
     formData.append('image', file);
 
     try {
-      const response = await axios.post(`${BACKEND_URL}/posts/upload_image/`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
-        },
-      });
-      
+      const response = await axios.post(
+        `${BACKEND_URL}/posts/upload_image/`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
       const uploadedUrl = response.data.image;
-      
+
       if (!uploadedUrl) {
-        return 'https://via.placeholder.com/150';
+        throw new Error('업로드된 이미지 URL이 없습니다.');
       }
 
       console.log('🔥 RESPONSE DATA:', response.data);
       console.log('🔥 UPLOADED URL:', uploadedUrl);
       console.log('🔥 UPLOADED URL TYPE:', typeof uploadedUrl);
 
-      return uploadedUrl;
+      callback(uploadedUrl);
 
     } catch (err) {
-      console.error('본문 이미지 격리 업로드 실패:', err.response?.data || err);
+      console.error(
+        '본문 이미지 업로드 실패:',
+        err.response?.data || err
+      );
       alert('이미지 업로드에 실패했습니다.');
-      return 'https://via.placeholder.com/150';
     }
   };
 
