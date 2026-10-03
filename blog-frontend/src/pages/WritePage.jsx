@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-//import axios from 'ajax'; // 혹은 axios
 import axios from 'axios';
 import MdEditor from 'react-markdown-editor-lite';
-import 'react-markdown-editor-lite/lib/index.css'; // 에디터 기본 스타일 적용
+import 'react-markdown-editor-lite/lib/index.css';
 import { useStore } from '../store/store';
 import MarkdownIt from 'markdown-it';
 
@@ -25,6 +24,7 @@ function WritePage() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [thumbnail, setThumbnail] = useState(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState(null); // ✅ 미리보기 추가
   const [loading, setLoading] = useState(false);
 
   const BACKEND_URL = 'https://blog-backend-35eq.onrender.com';
@@ -50,47 +50,68 @@ function WritePage() {
       .catch(err => console.error('카테고리 로드 실패', err));
   }, [isAuthenticated, navigate]);
 
-  // Image Upload Handler: Cloudinary 전송 및 URL 반환
-  const handleImageUpload = async (file, callback) => {
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append('image', file);
-
-    try {
-      const response = await axios.post(
-        `${BACKEND_URL}/posts/upload_image/`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      );
-
-      const uploadedUrl = response.data.image;
-
-      if (!uploadedUrl) {
-        throw new Error('업로드된 이미지 URL이 없습니다.');
+  // ✅ Promise 버전: 썸네일, 게시글 이미지 모두 사용 가능
+  const uploadImageToCloudinary = (file) => {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        reject(new Error('파일이 없습니다'));
+        return;
       }
 
-      console.log('🔥 RESPONSE DATA:', response.data);
-      console.log('🔥 UPLOADED URL:', uploadedUrl);
-      console.log('🔥 UPLOADED URL TYPE:', typeof uploadedUrl);
+      const formData = new FormData();
+      formData.append('image', file);
 
-      callback(uploadedUrl);
+      axios.post(`${BACKEND_URL}/posts/upload_image/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+        .then((response) => {
+          const uploadedUrl = response.data.image;
 
+          if (!uploadedUrl) {
+            reject(new Error('업로드된 이미지 URL이 없습니다'));
+            return;
+          }
+
+          console.log('🔥 RESPONSE DATA:', response.data);
+          console.log('🔥 UPLOADED URL:', uploadedUrl);
+          console.log('🔥 UPLOADED URL TYPE:', typeof uploadedUrl);
+
+          resolve(uploadedUrl);
+        })
+        .catch((err) => {
+          console.error('이미지 업로드 실패:', err.response?.data || err);
+          reject(err);
+        });
+    });
+  };
+
+  // ✅ 에디터의 이미지 업로드 핸들러
+  const handleImageUpload = async (file, callback) => {
+    try {
+      const url = await uploadImageToCloudinary(file);
+      callback(url);
     } catch (err) {
-      console.error(
-        '본문 이미지 업로드 실패:',
-        err.response?.data || err
-      );
+      console.error('본문 이미지 업로드 실패:', err);
       alert('이미지 업로드에 실패했습니다.');
+      callback(null);
     }
   };
 
-  // 발행하기 버튼 클릭 이벤트
+  // ✅ 썸네일 선택 핸들러
+  const handleThumbnailSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setThumbnail(file);
+      // 로컬 미리보기 (임시 URL)
+      setThumbnailPreview(URL.createObjectURL(file));
+      console.log('📷 썸네일 선택됨:', file.name, file.size);
+    }
+  };
+
+  // ✅ 발행하기 버튼 클릭 이벤트 (async/await 사용)
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -106,25 +127,43 @@ function WritePage() {
 
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append('category', selectedCategory);
-    if (thumbnail) formData.append('image', thumbnail); 
-
-    formData.append('title', title);
-    formData.append('content', content);
-
     try {
-      await axios.post(`${BACKEND_URL}/posts/`, formData, {
+      let thumbnailUrl = null;
+
+      // ✅ Step 1: 썸네일이 있으면 먼저 클라우디네리에 업로드
+      if (thumbnail) {
+        console.log('🚀 썸네일 업로드 시작...');
+        thumbnailUrl = await uploadImageToCloudinary(thumbnail);
+        console.log('✅ 썸네일 클라우디네리 URL 획득:', thumbnailUrl);
+      }
+
+      // ✅ Step 2: 게시글 데이터 준비 (클라우디네리 URL 포함)
+      const formData = new FormData();
+      formData.append('category', selectedCategory);
+      formData.append('title', title);
+      formData.append('content', content);
+      
+      // ✅ 핵심: 파일이 아닌 클라우디네리 URL을 전송
+      if (thumbnailUrl) {
+        formData.append('image', thumbnailUrl);
+        console.log('📤 게시글 formData에 이미지 URL 추가:', thumbnailUrl);
+      }
+
+      // ✅ Step 3: 게시글 저장
+      const response = await axios.post(`${BACKEND_URL}/posts/`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`,
         },
       });
+
+      console.log('✅ 게시글 발행 완료:', response.data);
       alert('📝 에세이 발행 완료!');
       navigate('/');
+
     } catch (err) {
-      console.error('글 발행 실패:', err);
-      alert('글 작성 권한이 없거나 오류가 발생했습니다.');
+      console.error('글 발행 실패:', err.response?.data || err);
+      alert(err.response?.data?.message || '글 작성 권한이 없거나 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -155,9 +194,29 @@ function WritePage() {
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => setThumbnail(e.target.files[0])}
+              onChange={handleThumbnailSelect}
               className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
             />
+            {/* ✅ 썸네일 미리보기 추가 */}
+            {thumbnailPreview && (
+              <div className="mt-3 relative">
+                <img 
+                  src={thumbnailPreview} 
+                  alt="썸네일 미리보기" 
+                  className="w-full h-40 object-cover rounded-lg border border-gray-200"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setThumbnail(null);
+                    setThumbnailPreview(null);
+                  }}
+                  className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold hover:bg-red-600"
+                >
+                  ✕ 제거
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
