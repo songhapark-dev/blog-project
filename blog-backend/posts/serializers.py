@@ -1,8 +1,7 @@
-# posts/serializers.py 전체 코드
+# blog-backend/posts/serializers.py
 from rest_framework import serializers
 from .models import Post, Category, Comment
 
-# 1. Comment Serializer (댓글)
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
@@ -10,7 +9,6 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at']
 
 
-# 2. Category Serializer (카테고리)
 class CategorySerializer(serializers.ModelSerializer):
     posts_count = serializers.SerializerMethodField()
     
@@ -22,7 +20,6 @@ class CategorySerializer(serializers.ModelSerializer):
         return obj.posts.count()
 
 
-# 3. Post List Serializer (게시글 목록 - 메인 화면 미리보기 썸네일 버그 박멸)
 class PostListSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(
         source='category.name',
@@ -46,15 +43,15 @@ class PostListSerializer(serializers.ModelSerializer):
 
     
     def get_image(self, obj):
-        if obj.image:
-            return obj.image.url
-        return None
+        # URLField이므로 바로 반환
+        return obj.image
 
 
-# 4. Post Detail Serializer (게시글 상세 보기 및 생성)
+# ✅ 수정: image를 CharField로 변경
 class PostDetailSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
+    image = serializers.CharField(required=False, allow_blank=True)  # ✅ CharField
     
     class Meta:
         model = Post
@@ -62,7 +59,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
             'id',
             'title',      
             'content',    
-            'image', 
+            'image',  # ← 이제 URL 문자열 가능
             'category',
             'category_name',
             'created_at',

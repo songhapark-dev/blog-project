@@ -1,3 +1,4 @@
+// blog-frontend/src/pages/WritePage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -19,17 +20,14 @@ function WritePage() {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-
-  // 카테고리 및 썸네일 정보
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [thumbnail, setThumbnail] = useState(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState(null); // ✅ 미리보기 추가
+  const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const BACKEND_URL = 'https://blog-backend-35eq.onrender.com';
 
-  // 보안 장치: 로그인 안 된 상태면 홈으로 튕겨내기
   useEffect(() => {
     if (!isAuthenticated) {
       alert('관리자 권한이 필요합니다. 🔒');
@@ -37,12 +35,10 @@ function WritePage() {
       return;
     }
     
-    // 카테고리 목록 불러오기
     axios.get(`${BACKEND_URL}/categories/`)
       .then(res => {
         const data = res.data.results || res.data;
         setCategories(data);
-        
         if (data && data.length > 0) {
           setSelectedCategory(data[0].id);
         }
@@ -50,7 +46,7 @@ function WritePage() {
       .catch(err => console.error('카테고리 로드 실패', err));
   }, [isAuthenticated, navigate]);
 
-  // ✅ Promise 버전: 썸네일, 게시글 이미지 모두 사용 가능
+  // ✅ 클라우디네리 업로드 (Promise 버전 - 썸네일, 본문 이미지 모두 사용)
   const uploadImageToCloudinary = (file) => {
     return new Promise((resolve, reject) => {
       if (!file) {
@@ -75,10 +71,7 @@ function WritePage() {
             return;
           }
 
-          console.log('🔥 RESPONSE DATA:', response.data);
-          console.log('🔥 UPLOADED URL:', uploadedUrl);
-          console.log('🔥 UPLOADED URL TYPE:', typeof uploadedUrl);
-
+          console.log('🔥 클라우디네리 업로드 완료:', uploadedUrl);
           resolve(uploadedUrl);
         })
         .catch((err) => {
@@ -88,7 +81,7 @@ function WritePage() {
     });
   };
 
-  // ✅ 에디터의 이미지 업로드 핸들러
+  // ✅ 에디터 이미지 업로드 핸들러
   const handleImageUpload = async (file, callback) => {
     try {
       const url = await uploadImageToCloudinary(file);
@@ -100,18 +93,17 @@ function WritePage() {
     }
   };
 
-  // ✅ 썸네일 선택 핸들러
+  // ✅ 썸네일 선택
   const handleThumbnailSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
       setThumbnail(file);
-      // 로컬 미리보기 (임시 URL)
       setThumbnailPreview(URL.createObjectURL(file));
-      console.log('📷 썸네일 선택됨:', file.name, file.size);
+      console.log('📷 썸네일 선택:', file.name, file.size);
     }
   };
 
-  // ✅ 발행하기 버튼 클릭 이벤트 (async/await 사용)
+  // ✅ 게시글 발행
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -130,29 +122,26 @@ function WritePage() {
     try {
       let thumbnailUrl = null;
 
-      // ✅ Step 1: 썸네일이 있으면 먼저 클라우디네리에 업로드
+      // Step 1: 썸네일 클라우디네리 업로드
       if (thumbnail) {
-        console.log('🚀 썸네일 업로드 시작...');
+        console.log('🚀 썸네일 클라우디네리 업로드 시작...');
         thumbnailUrl = await uploadImageToCloudinary(thumbnail);
-        console.log('✅ 썸네일 클라우디네리 URL 획득:', thumbnailUrl);
+        console.log('✅ 썸네일 URL 획득:', thumbnailUrl);
       }
 
-      // ✅ Step 2: 게시글 데이터 준비 (클라우디네리 URL 포함)
-      const formData = new FormData();
-      formData.append('category', selectedCategory);
-      formData.append('title', title);
-      formData.append('content', content);
-      
-      // ✅ 핵심: 파일이 아닌 클라우디네리 URL을 전송
-      if (thumbnailUrl) {
-        formData.append('image', thumbnailUrl);
-        console.log('📤 게시글 formData에 이미지 URL 추가:', thumbnailUrl);
-      }
+      // Step 2: 게시글 저장 (클라우디네리 URL 포함)
+      const postData = {
+        category: selectedCategory,
+        title: title,
+        content: content,
+        image: thumbnailUrl || '',  // ✅ URLField에 저장 가능
+      };
 
-      // ✅ Step 3: 게시글 저장
-      const response = await axios.post(`${BACKEND_URL}/posts/`, formData, {
+      console.log('📤 게시글 데이터:', postData);
+
+      const response = await axios.post(`${BACKEND_URL}/posts/`, postData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',  // ✅ JSON
           'Authorization': `Bearer ${token}`,
         },
       });
@@ -162,7 +151,7 @@ function WritePage() {
       navigate('/');
 
     } catch (err) {
-      console.error('글 발행 실패:', err.response?.data || err);
+      console.error('❌ 글 발행 실패:', err.response?.data || err);
       alert(err.response?.data?.message || '글 작성 권한이 없거나 오류가 발생했습니다.');
     } finally {
       setLoading(false);
@@ -197,7 +186,7 @@ function WritePage() {
               onChange={handleThumbnailSelect}
               className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
             />
-            {/* ✅ 썸네일 미리보기 추가 */}
+            {/* ✅ 썸네일 미리보기 */}
             {thumbnailPreview && (
               <div className="mt-3 relative">
                 <img 
@@ -221,9 +210,7 @@ function WritePage() {
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-            제목
-          </label>
+          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">제목</label>
           <input
             type="text"
             value={title}
@@ -234,9 +221,7 @@ function WritePage() {
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-            본문 마크다운
-          </label>
+          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">본문 마크다운</label>
           <MdEditor
             value={content}
             style={{ height: '600px', borderRadius: '12px' }}
@@ -262,6 +247,6 @@ function WritePage() {
       </form>
     </div>
   );
-} 
+}
 
 export default WritePage;
