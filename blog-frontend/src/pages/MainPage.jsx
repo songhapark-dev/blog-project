@@ -99,7 +99,7 @@ function MainPage() {
 
     return (
     <div
-      className="min-h-screen"
+      className="min-h-screen w-full"
       style={{
         backgroundImage: "url('/background_big.png')",
         backgroundRepeat: 'repeat',
