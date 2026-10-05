@@ -1,4 +1,3 @@
-// blog-frontend/src/pages/WritePage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -46,7 +45,7 @@ function WritePage() {
       .catch(err => console.error('카테고리 로드 실패', err));
   }, [isAuthenticated, navigate]);
 
-  // ✅ 클라우디네리 업로드 (Promise 버전 - 썸네일, 본문 이미지 모두 사용)
+  // Cloudinary Upload (Promise version - Thumbnail & Editor Image)
   const uploadImageToCloudinary = (file) => {
     return new Promise((resolve, reject) => {
       if (!file) {
@@ -81,7 +80,7 @@ function WritePage() {
     });
   };
 
-  // ✅ 에디터 이미지 업로드 핸들러
+  // Editor Image Upload Handler
   const handleImageUpload = async (file, callback) => {
     try {
       const url = await uploadImageToCloudinary(file);
@@ -93,7 +92,7 @@ function WritePage() {
     }
   };
 
-  // ✅ 썸네일 선택
+  // Thumbnail Selection Handler
   const handleThumbnailSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -103,7 +102,7 @@ function WritePage() {
     }
   };
 
-  // ✅ 게시글 발행
+  // Post Submission Handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -122,26 +121,24 @@ function WritePage() {
     try {
       let thumbnailUrl = null;
 
-      // Step 1: 썸네일 클라우디네리 업로드
+      // Step 1: Thumbnail Upload to Cloudinary if selected
       if (thumbnail) {
         console.log('🚀 썸네일 클라우디네리 업로드 시작...');
         thumbnailUrl = await uploadImageToCloudinary(thumbnail);
         console.log('✅ 썸네일 URL 획득:', thumbnailUrl);
       }
 
-      // Step 2: 게시글 저장 (클라우디네리 URL 포함)
+      // Step 2: Post Data Preparation
       const postData = {
         category: selectedCategory,
         title: title,
         content: content,
-        image: thumbnailUrl || '',  // ✅ URLField에 저장 가능
+        image: thumbnailUrl || '', 
       };
-
-      console.log('📤 게시글 데이터:', postData);
 
       const response = await axios.post(`${BACKEND_URL}/posts/`, postData, {
         headers: {
-          'Content-Type': 'application/json',  // ✅ JSON
+          'Content-Type': 'application/json',  
           'Authorization': `Bearer ${token}`,
         },
       });
@@ -242,7 +239,7 @@ function WritePage() {
           disabled={loading}
           className="w-full py-4 bg-gray-950 text-white font-extrabold rounded-xl hover:bg-red-600 transition shadow-lg disabled:bg-gray-300"
         >
-          {loading ? '서버로 안전하게 발행 중...' : '🚀 무대로 발행하기'}
+          {loading ? '서버로 안전하게 발행 중...' : '무대로 발행하기'}
         </button>
       </form>
     </div>

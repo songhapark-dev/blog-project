@@ -13,26 +13,23 @@ const mdParser = new MarkdownIt({
 });
 
 function EditPage() {
-  const { id } = useParams(); // URL 주소창에서 수정할 글의 ID 추출
+  const { id } = useParams();
   const navigate = useNavigate();
   
   const token = useStore((state) => state.token);
   const isAuthenticated = useStore((state) => state.isAuthenticated);
 
-  // 수정용 문자열 상태 단일화 복구
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-
-  // 카테고리 및 컴포넌트 제어 상태
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [thumbnail, setThumbnail] = useState(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState(null); // ✅ 추가
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
   const BACKEND_URL = 'https://blog-backend-35eq.onrender.com';
 
-  // 1. 보안 장치 확인 및 기존 데이터 프리로드(Pre-load) 파이프라인
   useEffect(() => {
     if (!isAuthenticated) {
       alert('관리자 권한이 필요합니다. 🔒');
@@ -67,49 +64,64 @@ function EditPage() {
     prepareData();
   }, [id, isAuthenticated, navigate]);
 
-  // Image Upload Handler: Cloudinary 전송 및 URL 반환
-  // Image Upload Handler: Cloudinary 전송 및 Markdown Editor에 URL 전달
-  const handleImageUpload = async (file, callback) => {
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append('image', file);
-
-    try {
-      const response = await axios.post(
-        `${BACKEND_URL}/posts/upload_image/`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`,
-          },
-        }
-      );
-
-      const uploadedUrl = response.data.image;
-
-      if (!uploadedUrl) {
-        throw new Error('업로드된 이미지 URL이 없습니다.');
+  // Cloudinary Upload (Promise version - Thumbnail & Editor Image)
+  const uploadImageToCloudinary = (file) => {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        reject(new Error('파일이 없습니다'));
+        return;
       }
 
-      console.log('🔥 EDIT RESPONSE DATA:', response.data);
-      console.log('🔥 EDIT UPLOADED URL:', uploadedUrl);
-      console.log('🔥 EDIT UPLOADED URL TYPE:', typeof uploadedUrl);
+      const formData = new FormData();
+      formData.append('image', file);
 
-      // 업로드된 Cloudinary URL을 Markdown Editor에 전달
-      callback(uploadedUrl);
+      axios.post(`${BACKEND_URL}/posts/upload_image/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+        .then((response) => {
+          const uploadedUrl = response.data.image;
 
+          if (!uploadedUrl) {
+            reject(new Error('업로드된 이미지 URL이 없습니다'));
+            return;
+          }
+
+          console.log('🔥 EDIT 클라우디네리 업로드 완료:', uploadedUrl);
+          resolve(uploadedUrl);
+        })
+        .catch((err) => {
+          console.error('수정 페이지 이미지 업로드 실패:', err.response?.data || err);
+          reject(err);
+        });
+    });
+  };
+
+  // Editor Image Upload Handler
+  const handleImageUpload = async (file, callback) => {
+    try {
+      const url = await uploadImageToCloudinary(file);
+      callback(url);
     } catch (err) {
-      console.error(
-        '수정 페이지 본문 이미지 업로드 실패:',
-        err.response?.data || err
-      );
+      console.error('본문 이미지 업로드 실패:', err);
       alert('이미지 업로드에 실패했습니다.');
+      callback(null);
     }
   };
 
-  // 3. 수정 완료 처리 핸들러 (PUT 전송 파이프라인)
+  // Thumbnail Selection Handler
+  const handleThumbnailSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setThumbnail(file);
+      setThumbnailPreview(URL.createObjectURL(file));
+      console.log('📷 썸네일 선택:', file.name, file.size);
+    }
+  };
+
+  // Post Submission Handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -120,27 +132,43 @@ function EditPage() {
 
     setSubmitting(true);
 
-    const formData = new FormData();
-    formData.append('category', selectedCategory);
-    formData.append('title', title);
-    formData.append('content', content);
-    
-    if (thumbnail) {
-      formData.append('image', thumbnail);
-    }
-
     try {
-      await axios.put(`${BACKEND_URL}/posts/${id}/`, formData, {
+      let thumbnailUrl = null;
+
+      // Step 1: if a new thumbnail is selected, upload it to Cloudinary
+      if (thumbnail) {
+        console.log('🚀 썸네일 클라우디네리 업로드 시작...');
+        thumbnailUrl = await uploadImageToCloudinary(thumbnail);
+        console.log('✅ 썸네일 URL 획득:', thumbnailUrl);
+      }
+
+      // Step 2: Prepare post data for submission
+      const postData = {
+        category: selectedCategory,
+        title: title,
+        content: content,
+      };
+
+      // if a new thumbnail was uploaded, include its URL in the post data
+      if (thumbnailUrl) {
+        postData.image = thumbnailUrl;    
+      }
+      // else: image 필드를 보내지 않음 → 백엔드가 기존 값 유지
+
+      const response = await axios.put(`${BACKEND_URL}/posts/${id}/`, postData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
       });
-      alert('✏️ 에세이가 성공적으로 수정되었습니다!');
-      navigate(`/posts/${id}`); 
+
+      console.log('✅ 게시글 수정 완료:', response.data);
+      alert('에세이가 성공적으로 수정되었습니다!');
+      navigate(`/posts/${id}`);
+
     } catch (err) {
       console.error('글 수정 반영 실패:', err.response?.data || err);
-      alert('글 수정 권한이 없거나 백엔드 전송 오류가 발생했습니다.');
+      alert(err.response?.data?.message || '글 수정 권한이 없거나 백엔드 전송 오류가 발생했습니다.');
     } finally {
       setSubmitting(false);
     }
@@ -186,9 +214,29 @@ function EditPage() {
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => setThumbnail(e.target.files[0])}
+              onChange={handleThumbnailSelect}
               className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
             />
+            {/* ✅ 썸네일 미리보기 추가 */}
+            {thumbnailPreview && (
+              <div className="mt-3 relative">
+                <img 
+                  src={thumbnailPreview} 
+                  alt="썸네일 미리보기" 
+                  className="w-full h-40 object-cover rounded-lg border border-gray-200"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setThumbnail(null);
+                    setThumbnailPreview(null);
+                  }}
+                  className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold hover:bg-red-600"
+                >
+                  ✕ 제거
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -225,7 +273,7 @@ function EditPage() {
           disabled={submitting}
           className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white font-extrabold rounded-xl transition shadow-lg disabled:bg-gray-300"
         >
-          {submitting ? '실전 서버 데이터 갱신 중...' : '✨ 수정 완료 및 실전 반영'}
+          {submitting ? '실전 서버 데이터 갱신 중...' : '수정 완료 및 실전 반영'}
         </button>
       </form>
     </div>

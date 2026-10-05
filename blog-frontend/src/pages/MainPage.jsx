@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useCategories } from '../hooks/useCategories';
-import { fetchPosts } from '../utils/api';
 import CategoryGrid from '../components/CategoryGrid';
 
 function MainPage() {
@@ -100,15 +98,24 @@ function MainPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+  <div
+    className="min-h-screen bg-black"
+    style={{
+      backgroundImage: "url('/background_big.png')",
+      backgroundRepeat: 'repeat',
+      backgroundSize: '600px auto',
+      backgroundPosition: 'top center',
+    }}
+  >
+    <div className="max-w-6xl mx-auto px-4 py-6">
       
       {/* 레퍼런스 스타일: 미니멀 테크 블로그 프로필 상단 */}
-      <section className="max-w-4xl mx-auto pt-4 pb-12 border-b border-gray-100 mb-14">
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+      <section className="max-w-4xl mx-auto pt-4 pb-8 border-b border-gray-100 mb-8">
+        <div className="flex flex-col md:flex-row items-center md:items-center gap-5">
           
           {/* 1. 동그란 프로필 이미지 (좌측 배칭) */}
           <div className="relative shrink-0">
-            <div className="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-gray-100 shadow-sm bg-gray-50">
+            <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-[#39ff14] shadow-[0_0_12px_rgba(57,255,20,0.25)] bg-black">
               <img 
                 src="/profile.jpeg"
                 alt="Songha Park" 
@@ -118,24 +125,20 @@ function MainPage() {
                 }}
               />
             </div>
-            {/* 감성적인 오스트리아 미니 국기 플로팅 뱃지 */}
-            <div className="absolute bottom-1 right-1 bg-white text-base p-1 rounded-full shadow-sm border border-gray-100 leading-none select-none">
-              🇦🇹
-            </div>
           </div>
 
           {/* 2. 타이포그래피 소개 글 본진 */}
           <div className="flex-1 text-center md:text-left space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-center md:justify-start gap-2.5">
-              <h1 className="text-2xl md:text-3xl font-black text-gray-950 tracking-tight">
+              <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight font-mono">
                 Songha Park
               </h1>
-              <span className="inline-block bg-red-50 text-red-600 text-[10px] font-extrabold px-2 py-0.5 rounded-md self-center">
-                Pharmacist 
+              <span className="inline-block border border-[#bf00ff] bg-black text-[#bf00ff] text-[10px] font-mono font-bold px-2 py-1 self-center">
+                PHARMACIST
               </span>
             </div>
             
-            <p className="text-sm md:text-base text-gray-600 leading-relaxed font-medium max-w-2xl">
+            <p className="text-sm md:text-base text-[#aaa] leading-relaxed font-medium max-w-2xl font-mono">
               약사, 비엔나에서 독일어 공부중 <br className="hidden md:inline" />
               심심해 죽겠어서 시작한 일상의 기록
             </p>
@@ -145,7 +148,7 @@ function MainPage() {
               {/* 1. 직관적인 편지봉투 메일 */}
               <a 
                 href="mailto:songhapark.pharm@gmail.com"
-                className="w-14 h-14 flex items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 hover:text-[#EA4335] hover:border-[#EA4335] hover:shadow-md transition-all duration-300"
+                className="w-11 h-11 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#39ff14] hover:border-[#39ff14] hover:shadow-[0_0_12px_rgba(57,255,20,0.35)] transition-all duration-300"
                 title="Email"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -158,7 +161,7 @@ function MainPage() {
                 href="https://www.linkedin.com/in/songha-park-4ab877378/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-14 h-14 flex items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 hover:text-[#0A66C2] hover:border-[#0A66C2] hover:shadow-md transition-all duration-300"
+                className="w-11 h-11 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#00a8ff] hover:border-[#00a8ff] hover:shadow-[0_0_12px_rgba(0,168,255,0.35)] transition-all duration-300"
                 title="LinkedIn"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -171,7 +174,7 @@ function MainPage() {
                 href="https://github.com/songhapark-dev" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-14 h-14 flex items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 hover:text-[#181717] hover:border-[#181717] hover:shadow-md transition-all duration-300"
+                className="w-11 h-11 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#bf00ff] hover:border-[#bf00ff] hover:shadow-[0_0_12px_rgba(191,0,255,0.35)] transition-all duration-300"
                 title="GitHub"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -186,7 +189,7 @@ function MainPage() {
 
       {/* 카테고리별 게시글 섹션 */}
       {categories.length > 0 ? (
-        <div className="space-y-16">
+        <div className="space-y-8">
           {categories.map((category) => (
             <CategoryGrid
               key={category.id}
@@ -204,6 +207,7 @@ function MainPage() {
         </div>
       )}
     </div>
+  </div>
   );
 }
 

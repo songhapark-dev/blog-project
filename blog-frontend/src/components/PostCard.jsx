@@ -1,3 +1,4 @@
+// blog-frontend/src/components/PostCard.jsx
 import { Link } from 'react-router-dom';
 
 function PostCard({ post }) {
@@ -6,6 +7,7 @@ function PostCard({ post }) {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return null;
 
+    // ✅ 이미 절대 경로면 그대로 반환 (클라우디네리)
     if (
       imagePath.startsWith('http://') ||
       imagePath.startsWith('https://')
@@ -13,13 +15,14 @@ function PostCard({ post }) {
       return imagePath;
     }
 
+    // ✅ 상대 경로면 백엔드 URL 붙임 (호환성)
     return `${BACKEND_URL}${imagePath}`;
   };
 
   return (
     <Link
       to={`/posts/${post.id}`}
-      className="group block relative aspect-[4/3] overflow-hidden bg-black border border-[#333] hover:border-[#39ff14] transition-all duration-300"
+      className="group block relative aspect-square overflow-hidden bg-black border border-[#333] hover:border-[#39ff14] transition-all duration-300"
     >
       {/* IMAGE */}
       {post.image ? (
@@ -34,6 +37,11 @@ function PostCard({ post }) {
             group-hover:scale-105
             group-hover:opacity-25
           "
+          onError={(e) => {
+            console.error("PostCard 이미지 로드 실패:", e.target.src);
+            // ✅ 폴백: 그래디언트 표시
+            e.target.style.display = 'none';
+          }}
         />
       ) : (
         <div

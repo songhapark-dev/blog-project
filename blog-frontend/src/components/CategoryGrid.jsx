@@ -6,7 +6,7 @@ function CategoryGrid({ categoryName, categoryId, posts }) {
   const displayPosts = posts.slice(0, 3);
 
   return (
-    <section className="mb-12">
+    <section className="mb-8">
 
       {/* CATEGORY HEADER */}
       <div className="flex items-end justify-between mb-4">
