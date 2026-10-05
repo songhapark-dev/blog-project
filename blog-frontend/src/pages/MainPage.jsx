@@ -97,117 +97,143 @@ function MainPage() {
     );
   }
 
-  return (
-  <div
-    className="min-h-screen bg-black"
-    style={{
-      backgroundImage: "url('/background_big.png')",
-      backgroundRepeat: 'repeat',
-      backgroundSize: '600px auto',
-      backgroundPosition: 'top center',
-    }}
-  >
-    <div className="max-w-6xl mx-auto px-4 py-6">
-      
-      {/* 레퍼런스 스타일: 미니멀 테크 블로그 프로필 상단 */}
-      <section className="max-w-4xl mx-auto pt-4 pb-8 border-b border-gray-100 mb-8">
-        <div className="flex flex-col md:flex-row items-center md:items-center gap-5">
-          
-          {/* 1. 동그란 프로필 이미지 (좌측 배칭) */}
-          <div className="relative shrink-0">
-            <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-[#39ff14] shadow-[0_0_12px_rgba(57,255,20,0.25)] bg-black">
-              <img 
-                src="/profile.jpeg"
-                alt="Songha Park" 
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80";
-                }}
+    return (
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundImage: "url('/background_big.png')",
+        backgroundRepeat: 'repeat',
+        backgroundSize: '600px auto',
+        backgroundPosition: 'top center',
+        backgroundColor: '#000',
+      }}
+    >
+      <div className="max-w-6xl mx-auto px-4 py-8">
+
+        {/* INTRODUCTION */}
+        <section className="max-w-4xl mx-auto mb-10 bg-black border border-[#333] px-6 py-6 md:px-8 md:py-7">
+          <div className="flex flex-col md:flex-row items-center md:items-center gap-5">
+
+            <div className="relative shrink-0">
+              <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-[#39ff14] shadow-[0_0_12px_rgba(57,255,20,0.25)] bg-black">
+                <img
+                  src="/profile.jpeg"
+                  alt="Songha Park"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src =
+                      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80";
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="flex-1 text-center md:text-left space-y-3">
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-center md:justify-start gap-2.5">
+                <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight font-mono">
+                  Songha Park
+                </h1>
+
+                <span className="inline-block border border-[#bf00ff] bg-black text-[#bf00ff] text-[10px] font-mono font-bold px-2 py-1 self-center">
+                  PHARMACIST
+                </span>
+              </div>
+
+              <p className="text-sm md:text-base text-[#aaa] leading-relaxed font-medium max-w-2xl font-mono">
+                약사, 비엔나에서 독일어 공부중 <br className="hidden md:inline" />
+                심심해 죽겠어서 시작한 일상의 기록
+              </p>
+
+              <div className="flex justify-center md:justify-start pt-3">
+
+                {/* Email */}
+                <a
+                  href="mailto:songhapark.pharm@gmail.com"
+                  className="w-11 h-11 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#39ff14] hover:border-[#39ff14] hover:shadow-[0_0_12px_rgba(57,255,20,0.35)] transition-all duration-300"
+                  title="Email"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3" y="5" width="18" height="14" rx="2" />
+                    <polyline points="3 7 12 13 21 7" />
+                  </svg>
+                </a>
+
+                {/* LinkedIn */}
+                <a
+                  href="https://www.linkedin.com/in/songha-park-4ab877378/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-11 h-11 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#00a8ff] hover:border-[#00a8ff] hover:shadow-[0_0_12px_rgba(0,168,255,0.35)] transition-all duration-300"
+                  title="LinkedIn"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M6.5 8.5H3.5V20h3V8.5ZM5 3C3.9 3 3 3.9 3 5s.9 2 2 2 2-.9 2-2-.9-2-2-2ZM20.5 13.4c0-3.4-1.8-5.2-4.3-5.2-2 0-2.9 1.1-3.4 1.8V8.5H10V20h2.8v-5.7c0-1.5.3-3 2.2-3 1.9 0 1.9 1.8 1.9 3.1V20H20v-6.6Z" />
+                  </svg>
+                </a>
+
+                {/* GitHub */}
+                <a
+                  href="https://github.com/songhapark-dev"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-11 h-11 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#bf00ff] hover:border-[#bf00ff] hover:shadow-[0_0_12px_rgba(191,0,255,0.35)] transition-all duration-300"
+                  title="GitHub"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.1c-3.2.7-3.87-1.54-3.87-1.54-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.25.45-2.27 1.19-3.07-.12-.29-.52-1.45.11-3.02 0 0 .97-.31 3.17 1.17a10.9 10.9 0 0 1 5.77 0c2.2-1.48 3.17-1.17 3.17-1.17.63 1.57.23 2.73.11 3.02.74.8 1.19 1.82 1.19 3.07 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.07.78 2.16v3.2c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+                  </svg>
+                </a>
+
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CATEGORIES */}
+        {categories.length > 0 ? (
+          <div className="space-y-8">
+            {categories.map((category) => (
+              <CategoryGrid
+                key={category.id}
+                categoryName={category.name}
+                categoryId={category.id}
+                posts={postsByCategory[category.id]?.posts || []}
               />
-            </div>
+            ))}
           </div>
-
-          {/* 2. 타이포그래피 소개 글 본진 */}
-          <div className="flex-1 text-center md:text-left space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-center md:justify-start gap-2.5">
-              <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight font-mono">
-                Songha Park
-              </h1>
-              <span className="inline-block border border-[#bf00ff] bg-black text-[#bf00ff] text-[10px] font-mono font-bold px-2 py-1 self-center">
-                PHARMACIST
-              </span>
-            </div>
-            
-            <p className="text-sm md:text-base text-[#aaa] leading-relaxed font-medium max-w-2xl font-mono">
-              약사, 비엔나에서 독일어 공부중 <br className="hidden md:inline" />
-              심심해 죽겠어서 시작한 일상의 기록
+        ) : (
+          <div className="text-center py-20 bg-black border border-[#333]">
+            <p className="text-gray-500 text-lg">
+              장고 어드민에서 첫 카테고리를 기다리는 중입니다.
             </p>
-
-            {/* 3. 심플 내비게이션 및 소셜 네트워크 트리오 */}
-            <div className="flex justify-center md:justify-start pt-3">
-              {/* 1. 직관적인 편지봉투 메일 */}
-              <a 
-                href="mailto:songhapark.pharm@gmail.com"
-                className="w-11 h-11 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#39ff14] hover:border-[#39ff14] hover:shadow-[0_0_12px_rgba(57,255,20,0.35)] transition-all duration-300"
-                title="Email"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                </svg>
-              </a>
-
-              {/* 2. 링크드인 공식 아이콘 */}
-              <a 
-                href="https://www.linkedin.com/in/songha-park-4ab877378/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-11 h-11 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#00a8ff] hover:border-[#00a8ff] hover:shadow-[0_0_12px_rgba(0,168,255,0.35)] transition-all duration-300"
-                title="LinkedIn"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                </svg>
-              </a>
-
-              {/* 3. 깃허브 공식 아이콘 */}
-              <a 
-                href="https://github.com/songhapark-dev" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-11 h-11 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#bf00ff] hover:border-[#bf00ff] hover:shadow-[0_0_12px_rgba(191,0,255,0.35)] transition-all duration-300"
-                title="GitHub"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.838 1.237 1.838 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-              </a>
-            </div>
           </div>
+        )}
 
-        </div>
-      </section>
-
-      {/* 카테고리별 게시글 섹션 */}
-      {categories.length > 0 ? (
-        <div className="space-y-8">
-          {categories.map((category) => (
-            <CategoryGrid
-              key={category.id}
-              categoryName={category.name}
-              categoryId={category.id}
-              posts={postsByCategory[category.id]?.posts || []}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
-          <p className="text-gray-500 text-lg">
-            장고 어드민에서 첫 카테고리를 기다리는 중입니다.
-          </p>
-        </div>
-      )}
+      </div>
     </div>
-  </div>
   );
 }
 
