@@ -69,33 +69,50 @@ function MainPage() {
   }
 }, [categories]);
 
-  // 로딩 상태
-  if (categoriesLoading || loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">비엔나에서 데이터 가져오는 중...</p>
-        </div>
-      </div>
-    );
-  }
+ // 로딩 상태
+if (categoriesLoading || loading) {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-lime-400 mx-auto mb-4"></div>
 
-  // 에러 상태
-  if (categoriesError || error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-red-600 text-lg font-semibold mb-4">
-            ⚠️ 오류가 발생했습니다.
-          </p>
-          <p className="text-gray-600">
-            {categoriesError || error}
-          </p>
-        </div>
+        <p className="text-lime-400 font-mono font-bold tracking-wide">
+          VIENNA DATA LOADING...
+        </p>
+
+        <p className="text-purple-500 text-sm font-mono mt-2">
+          Connecting to the archive...
+        </p>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
+// 에러 상태
+if (categoriesError || error) {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="text-center">
+
+        {/* Loading icon */}
+        <div className="relative w-20 h-20 mx-auto mb-6">
+          <div className="absolute inset-0 rounded-full border-4 border-blue-600 animate-spin"></div>
+          <div className="absolute inset-2 rounded-full border-4 border-purple-500 animate-spin"></div>
+          <div className="absolute inset-4 rounded-full border-4 border-lime-400"></div>
+        </div>
+
+        <p className="text-lime-400 font-mono font-bold tracking-widest">
+          LOADING...
+        </p>
+
+        <p className="text-blue-500 text-xs font-mono mt-2">
+          FETCHING FROM VIENNA
+        </p>
+
+      </div>
+    </div>
+  );
+}
 
     return (
     <div
