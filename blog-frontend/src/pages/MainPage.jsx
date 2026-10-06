@@ -72,31 +72,17 @@ function MainPage() {
   // 로딩 상태
   if (categoriesLoading || loading) {
     return (
-      <div
-        className="flex items-center justify-center min-h-screen"
-        style={{
-          backgroundColor: '#000',
-          backgroundImage: "url('/background_big.png')",
-          backgroundRepeat: 'repeat',
-          backgroundSize: '600px auto',
-          backgroundPosition: 'top center',
-        }}
-      >
+      <div className="flex items-center justify-center min-h-screen bg-black">
         <div className="text-center">
 
-          {/* Y2K Logo-style Spinner */}
-          <div
-            className="w-14 h-14 mx-auto mb-5 rounded-full animate-spin"
-            style={{
-              background: 'conic-gradient(#39ff14, #39ff14, #bf00ff, #bf00ff, #39ff14)',
-              padding: '4px',
-            }}
-          >
-            <div className="w-full h-full rounded-full bg-black"></div>
-          </div>
+          <img
+            src="/smile_loading.png"
+            alt="Loading"
+            className="w-24 h-24 mx-auto animate-spin"
+          />
 
-          <p className="text-white font-mono font-bold text-lg">
-            데이터 가져오는 중...
+          <p className="mt-6 text-white text-xl font-bold font-mono">
+            Loading...
           </p>
 
         </div>
