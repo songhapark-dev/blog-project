@@ -93,27 +93,22 @@ function MainPage() {
   // 에러 상태
   if (categoriesError || error) {
     return (
-      <div
-        className="flex items-center justify-center min-h-screen"
-        style={{
-          backgroundColor: '#000',
-          backgroundImage: "url('/background_big.png')",
-          backgroundRepeat: 'repeat',
-          backgroundSize: '600px auto',
-          backgroundPosition: 'top center',
-        }}
-      >
-        <div className="text-center">
-          <p className="text-white text-lg font-bold font-mono mb-4">
-            ⚠️ 오류가 발생했습니다.
-          </p>
+  <div className="flex items-center justify-center min-h-screen bg-black">
+    <div className="text-center">
 
-          <p className="text-white font-mono">
-            {categoriesError || error}
-          </p>
-        </div>
-      </div>
-    );
+      <img
+        src="/smile_error.png"
+        alt="Error"
+        className="w-24 h-24 mx-auto"
+      />
+
+      <p className="mt-6 text-white text-xl font-bold font-mono">
+        ERROR!
+      </p>
+
+    </div>
+  </div>
+);
   }
 
     return (
