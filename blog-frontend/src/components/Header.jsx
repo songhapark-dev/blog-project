@@ -35,8 +35,6 @@ function Header() {
       className="
         sticky top-0 z-50
         bg-black
-        border-b-2 border-[#39ff14]
-        shadow-[0_0_12px_rgba(57,255,20,0.3)]
       "
     >
 

@@ -142,7 +142,7 @@ function MainPage() {
       }}
     >
       {/* INTRODUCTION */}
-      <section className="w-full bg-black border-y border-[#39ff14] mb-10">
+      <section className="w-full bg-[#151515]" >
         <div className="max-w-6xl mx-auto px-4 py-5 md:px-6 md:py-6">
 
           {/* Profile */}
@@ -182,7 +182,7 @@ function MainPage() {
               </p>
 
               {/* Social links */}
-              <div className="flex justify-center md:justify-start mt-3">
+              <div className="flex justify-center md:justify-start gap-6 mt-4">
 
                 {/* Email */}
                 <a
