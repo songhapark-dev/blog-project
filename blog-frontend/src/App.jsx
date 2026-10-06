@@ -6,7 +6,6 @@ import PostDetail from './pages/PostDetail';
 import CategoryPage from './pages/CategoryPage'; 
 import LoginPage from './pages/LoginPage';
 import WritePage from './pages/WritePage';
-// 추가: 방금 신설한 게시물 관리 및 수정용 컴포넌트 임포트
 import ManagePage from './pages/ManagePage';
 import EditPage from './pages/EditPage'; 
 
@@ -16,7 +15,7 @@ function App() {
       <div className="min-h-screen bg-gray-50">
         <Header />
 
-        <main className="max-w-6xl mx-auto px-4 py-8">
+        <main>
           <Routes>
             {/* 메인 페이지 라우트 */}
             <Route path="/" element={<MainPage />} />
