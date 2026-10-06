@@ -65,9 +65,7 @@ function PostCard({ post }) {
           from-black/80
           via-black/20
           to-transparent
-          group-hover:from-white/60
-          group-hover:via-white/30
-          group-hover:to-white/20
+          group-hover:bg-white/40
           transition-all duration-500
         "
       />
@@ -75,15 +73,10 @@ function PostCard({ post }) {
       {/* CATEGORY */}
       <div
         className="
-          absolute top-3 left-3
-          text-[9px] font-mono tracking-widest
-          text-[#39ff14]
-          border border-[#39ff14]
-          px-2 py-1
-          bg-black/70
-          group-hover:bg-white/80
-          group-hover:text-black
-          group-hover:border-black
+          absolute top-5 left-5
+          text-[10px] font-mono tracking-widest
+          text-white
+          group-hover:text-white
           transition-all duration-300
         "
       >

@@ -87,7 +87,7 @@ function Header() {
             <div
               className="
                 font-mono
-                text-2xl
+                text-3xl
                 font-bold
                 leading-none
                 tracking-tight
@@ -113,7 +113,7 @@ function Header() {
               className="
                 mt-2
                 font-mono
-                text-[11px]
+                text-[10px]
                 font-bold
                 tracking-[0.18em]
                 whitespace-nowrap
@@ -159,9 +159,9 @@ function Header() {
           <Link
             to="/"
             className="
-              px-4
+              px-5
               py-2
-              text-sm
+              text-lg
               text-[#39ff14]
               border border-transparent
               hover:border-[#39ff14]
@@ -178,9 +178,9 @@ function Header() {
           <Link
             to="/about"
             className="
-              px-4
+              px-5
               py-2
-              text-sm
+              text-lg
               text-[#8b4cff]
               border border-transparent
               hover:border-[#8b4cff]
@@ -198,9 +198,9 @@ function Header() {
             <Link
               to="/write"
               className="
-                px-4
+                px-5
                 py-2
-                text-sm
+                text-lg
                 text-[#704cff]
                 border border-transparent
                 hover:border-[#704cff]
@@ -219,9 +219,9 @@ function Header() {
             <Link
               to="/manage"
               className="
-                px-4
+                px-5
                 py-2
-                text-sm
+                text-lg
                 text-[#a43cff]
                 border border-transparent
                 hover:border-[#a43cff]

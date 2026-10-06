@@ -143,7 +143,7 @@ function MainPage() {
     >
       {/* INTRODUCTION */}
       <section className="w-full bg-[#151515]" >
-        <div className="max-w-6xl mx-auto px-4 py-5 md:px-6 md:py-6">
+        <div className="max-w-6xl mx-auto px-4 py-5 md:px-6 md:py-10">
 
           {/* Profile */}
           <div className="flex flex-col md:flex-row items-center md:items-center gap-5 md:gap-7">
