@@ -69,50 +69,66 @@ function MainPage() {
   }
 }, [categories]);
 
- // 로딩 상태
-if (categoriesLoading || loading) {
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-black">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-lime-400 mx-auto mb-4"></div>
+  // 로딩 상태
+  if (categoriesLoading || loading) {
+    return (
+      <div
+        className="flex items-center justify-center min-h-screen"
+        style={{
+          backgroundColor: '#000',
+          backgroundImage: "url('/background_big.png')",
+          backgroundRepeat: 'repeat',
+          backgroundSize: '600px auto',
+          backgroundPosition: 'top center',
+        }}
+      >
+        <div className="text-center">
 
-        <p className="text-lime-400 font-mono font-bold tracking-wide">
-          VIENNA DATA LOADING...
-        </p>
+          {/* Y2K Logo-style Spinner */}
+          <div
+            className="w-14 h-14 mx-auto mb-5 rounded-full animate-spin"
+            style={{
+              background: 'conic-gradient(#39ff14, #39ff14, #bf00ff, #bf00ff, #39ff14)',
+              padding: '4px',
+            }}
+          >
+            <div className="w-full h-full rounded-full bg-black"></div>
+          </div>
 
-        <p className="text-purple-500 text-sm font-mono mt-2">
-          Connecting to the archive...
-        </p>
-      </div>
-    </div>
-  );
-}
+          <p className="text-white font-mono font-bold text-lg">
+            데이터 가져오는 중...
+          </p>
 
-// 에러 상태
-if (categoriesError || error) {
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-black">
-      <div className="text-center">
-
-        {/* Loading icon */}
-        <div className="relative w-20 h-20 mx-auto mb-6">
-          <div className="absolute inset-0 rounded-full border-4 border-blue-600 animate-spin"></div>
-          <div className="absolute inset-2 rounded-full border-4 border-purple-500 animate-spin"></div>
-          <div className="absolute inset-4 rounded-full border-4 border-lime-400"></div>
         </div>
-
-        <p className="text-lime-400 font-mono font-bold tracking-widest">
-          LOADING...
-        </p>
-
-        <p className="text-blue-500 text-xs font-mono mt-2">
-          FETCHING FROM VIENNA
-        </p>
-
       </div>
-    </div>
-  );
-}
+    );
+  }
+
+  // 에러 상태
+  if (categoriesError || error) {
+    return (
+      <div
+        className="flex items-center justify-center min-h-screen"
+        style={{
+          backgroundColor: '#000',
+          backgroundImage: "url('/background_big.png')",
+          backgroundRepeat: 'repeat',
+          backgroundSize: '600px auto',
+          backgroundPosition: 'top center',
+        }}
+      >
+        <div className="text-center">
+          <p className="text-white text-lg font-bold font-mono mb-4">
+            ⚠️ 오류가 발생했습니다.
+          </p>
+
+          <p className="text-white font-mono">
+            {categoriesError || error}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
     return (
     <div
@@ -125,14 +141,16 @@ if (categoriesError || error) {
         backgroundColor: '#000',
       }}
     >
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      {/* INTRODUCTION */}
+      <section className="w-full bg-black border-y border-[#39ff14] mb-10">
+        <div className="max-w-6xl mx-auto px-4 py-5 md:px-6 md:py-6">
 
-        {/* INTRODUCTION */}
-        <section className="max-w-4xl mx-auto mb-10 bg-black border border-[#333] px-6 py-6 md:px-8 md:py-7">
-          <div className="flex flex-col md:flex-row items-center md:items-center gap-5">
+          {/* Profile */}
+          <div className="flex flex-col md:flex-row items-center md:items-center gap-5 md:gap-7">
 
+            {/* Profile image */}
             <div className="relative shrink-0">
-              <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-2 border-[#39ff14] shadow-[0_0_12px_rgba(57,255,20,0.25)] bg-black">
+              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-[#39ff14] shadow-[0_0_12px_rgba(57,255,20,0.25)] bg-black">
                 <img
                   src="/profile.jpeg"
                   alt="Songha Park"
@@ -145,7 +163,8 @@ if (categoriesError || error) {
               </div>
             </div>
 
-            <div className="flex-1 text-center md:text-left space-y-3">
+            {/* Profile text */}
+            <div className="flex-1 text-center md:text-left">
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-center md:justify-start gap-2.5">
                 <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight font-mono">
@@ -157,23 +176,24 @@ if (categoriesError || error) {
                 </span>
               </div>
 
-              <p className="text-sm md:text-base text-[#aaa] leading-relaxed font-medium max-w-2xl font-mono">
+              <p className="text-sm md:text-base text-[#aaa] leading-relaxed font-medium mt-2 font-mono">
                 약사, 비엔나에서 독일어 공부중 <br className="hidden md:inline" />
                 심심해 죽겠어서 시작한 일상의 기록
               </p>
 
-              <div className="flex justify-center md:justify-start pt-3">
+              {/* Social links */}
+              <div className="flex justify-center md:justify-start mt-3">
 
                 {/* Email */}
                 <a
                   href="mailto:songhapark.pharm@gmail.com"
-                  className="w-11 h-11 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#39ff14] hover:border-[#39ff14] hover:shadow-[0_0_12px_rgba(57,255,20,0.35)] transition-all duration-300"
+                  className="w-10 h-10 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#39ff14] hover:border-[#39ff14] hover:shadow-[0_0_12px_rgba(57,255,20,0.35)] transition-all duration-300"
                   title="Email"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
+                    width="19"
+                    height="19"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -191,13 +211,13 @@ if (categoriesError || error) {
                   href="https://www.linkedin.com/in/songha-park-4ab877378/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-11 h-11 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#00a8ff] hover:border-[#00a8ff] hover:shadow-[0_0_12px_rgba(0,168,255,0.35)] transition-all duration-300"
+                  className="w-10 h-10 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#00a8ff] hover:border-[#00a8ff] hover:shadow-[0_0_12px_rgba(0,168,255,0.35)] transition-all duration-300"
                   title="LinkedIn"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
+                    width="19"
+                    height="19"
                     viewBox="0 0 24 24"
                     fill="currentColor"
                   >
@@ -210,13 +230,13 @@ if (categoriesError || error) {
                   href="https://github.com/songhapark-dev"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-11 h-11 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#bf00ff] hover:border-[#bf00ff] hover:shadow-[0_0_12px_rgba(191,0,255,0.35)] transition-all duration-300"
+                  className="w-10 h-10 flex items-center justify-center border border-[#333] bg-black text-white hover:text-[#bf00ff] hover:border-[#bf00ff] hover:shadow-[0_0_12px_rgba(191,0,255,0.35)] transition-all duration-300"
                   title="GitHub"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
+                    width="19"
+                    height="19"
                     viewBox="0 0 24 24"
                     fill="currentColor"
                   >
@@ -227,9 +247,11 @@ if (categoriesError || error) {
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CATEGORIES */}
+      {/* CATEGORIES */}
+      <div className="max-w-6xl mx-auto px-4">
         {categories.length > 0 ? (
           <div className="space-y-8">
             {categories.map((category) => (
