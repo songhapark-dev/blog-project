@@ -131,7 +131,7 @@ function MainPage() {
 
             {/* Profile image */}
             <div className="relative shrink-0">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-[#39ff14] shadow-[0_0_12px_rgba(57,255,20,0.25)] bg-black">
+              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden bg-black">
                 <img
                   src="/profile.jpeg"
                   alt="Songha Park"
