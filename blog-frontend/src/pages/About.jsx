@@ -57,7 +57,7 @@ const About = () => {
               </p>
 
               <p className="text-sm md:text-base text-white/70">
-                아마추어 Python / React 개발자
+                Universität Wien 석사 준비생
               </p>
             </div>
 
