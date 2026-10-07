@@ -175,8 +175,9 @@ function Header() {
               flex
               items-center
               gap-1
-              overflow-x-auto
               min-w-0
+              flex-1
+              overflow-x-auto
               font-mono
               font-bold
             "
@@ -254,9 +255,9 @@ function Header() {
           {/* LOGIN / LOGOUT */}
           <div
             className="
-              ml-auto
-              pl-4
               shrink-0
+              ml-4
+              pl-4
             "
           >
             {isAuthenticated ? (
@@ -283,7 +284,7 @@ function Header() {
                 to="/login"
                 className="
                   font-mono
-                  text-lg
+                  text-base
                   font-bold
                   text-white
                   hover:text-[#39ff14]
