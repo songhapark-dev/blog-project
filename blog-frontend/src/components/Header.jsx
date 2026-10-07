@@ -73,8 +73,8 @@ function Header() {
             src="/smile_icon.png"
             alt="Songha's Blog"
             className="
-              w-16
-              h-16
+              w-20
+              h-20
               object-contain
               shrink-0
             "
@@ -156,25 +156,6 @@ function Header() {
             font-bold
           "
         >
-
-          {/* HOME */}
-          <Link
-            to="/"
-            className="
-              px-5
-              py-2
-              text-lg
-              text-[#39ff14]
-              border border-transparent
-              hover:border-[#39ff14]
-              hover:bg-[#39ff14]/10
-              hover:shadow-[0_0_8px_rgba(57,255,20,0.35)]
-              transition-all
-              shrink-0
-            "
-          >
-            HOME
-          </Link>
 
 
           {/* ABOUT */}
@@ -294,7 +275,7 @@ function Header() {
           )}
 
           {/* SEARCH */}
-          <div className="flex-1 sm:flex-none">
+          <div className="w-full sm:w-auto">
             <SearchBar />
           </div>
         </div>

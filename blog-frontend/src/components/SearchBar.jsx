@@ -30,14 +30,14 @@ function SearchBar() {
       className="
         flex
         items-center
-        w-[300px]
-        h-8
+        w-full
+        sm:w-[300px]
+        h-9
         border
-        border-[#39ff14]
+        border-[#333]
         bg-black
-        shadow-[0_0_8px_rgba(57,255,20,0.25)]
-        focus-within:shadow-[0_0_10px_rgba(0,170,255,0.5)]
-        transition-all
+        focus-within:border-[#555]
+        transition-colors
       "
     >
       <input
@@ -51,7 +51,7 @@ function SearchBar() {
           h-full
           px-3
           bg-transparent
-          text-[#39ff14]
+          text-white
           placeholder-[#555]
           font-mono
           text-xs
@@ -71,11 +71,10 @@ function SearchBar() {
           justify-center
           bg-transparent
           border-none
-          text-[#00aaff]
+          text-[#888]
           text-lg
-          hover:text-[#bf00ff]
-          hover:drop-shadow-[0_0_6px_rgba(191,0,255,0.9)]
-          transition-all
+          hover:text-white
+          transition-colors
         "
       >
         🔍
