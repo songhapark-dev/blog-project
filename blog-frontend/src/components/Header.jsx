@@ -86,7 +86,7 @@ function Header() {
             <div
               className="
                 font-mono
-                text-lg sm:text-3xl
+                text-3xl
                 font-bold
                 leading-none
                 tracking-tight
@@ -110,7 +110,6 @@ function Header() {
             {/* Subtitle */}
             <div
               className="
-                hidden sm:block
                 mt-2
                 font-mono
                 text-[10px]
