@@ -222,21 +222,9 @@ function Header() {
 
         </nav>
 
-        <div
-          className="
-            basis-full
-            sm:basis-auto
-            sm:ml-auto
-            flex
-            items-center
-            gap-4
-            w-full
-            sm:w-auto
-          "
-        >
 
-
-          {/* LOGIN / LOGOUT */}
+        {/* LOGIN / LOGOUT */}
+        <div className="ml-auto shrink-0"></div>
           {isAuthenticated ? (
             <button
               onClick={handleLogoutClick}
@@ -245,7 +233,7 @@ function Header() {
                 border-none
                 p-0
                 font-mono
-                text-xs
+                text-lg
                 font-bold
                 text-white
                 hover:text-[#39ff14]
@@ -261,7 +249,7 @@ function Header() {
               to="/login"
               className="
                 font-mono
-                text-xs
+                text-lg
                 font-bold
                 text-white
                 hover:text-[#39ff14]
@@ -272,13 +260,17 @@ function Header() {
               LOGIN
             </Link>
           )}
+        </div>
 
           {/* SEARCH */}
-          <div className="w-full sm:w-auto">
+          <div className="
+            basis-full
+            sm:basis-auto
+            sm:ml-4
+            w-full
+            sm:w-auto">
             <SearchBar />
           </div>
-        </div>
-      </div>
       
     </header>
   );
