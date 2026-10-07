@@ -41,14 +41,13 @@ function Header() {
       {/* HEADER FRAME */}
       <div
         className="
-          relative
           w-full
-          px-6
+          px-4 sm:px-6
           py-3
           flex
+          flex-wrap
           items-center
-          gap-8
-          overflow-hidden
+          gap-3 sm:gap-8
         "
       >
 
@@ -87,7 +86,7 @@ function Header() {
             <div
               className="
                 font-mono
-                text-3xl
+                text-lg sm:text-3xl
                 font-bold
                 leading-none
                 tracking-tight
@@ -111,6 +110,7 @@ function Header() {
             {/* Subtitle */}
             <div
               className="
+                hidden sm:block
                 mt-2
                 font-mono
                 text-[10px]
@@ -149,7 +149,9 @@ function Header() {
             flex
             items-center
             gap-1
-            ml-6
+            ml-0 sm:ml-6
+            w-full sm:w-auto
+            overflow-x-auto
             font-mono
             font-bold
           "
@@ -168,6 +170,7 @@ function Header() {
               hover:bg-[#39ff14]/10
               hover:shadow-[0_0_8px_rgba(57,255,20,0.35)]
               transition-all
+              shrink-0
             "
           >
             HOME
@@ -187,6 +190,7 @@ function Header() {
               hover:bg-[#8b4cff]/10
               hover:shadow-[0_0_8px_rgba(139,76,255,0.35)]
               transition-all
+              shrink-0
             "
           >
             ABOUT
@@ -207,6 +211,7 @@ function Header() {
                 hover:bg-[#704cff]/10
                 hover:shadow-[0_0_8px_rgba(112,76,255,0.35)]
                 transition-all
+                shrink-0
               "
             >
               WRITE
@@ -228,6 +233,7 @@ function Header() {
                 hover:bg-[#a43cff]/10
                 hover:shadow-[0_0_8px_rgba(164,60,255,0.35)]
                 transition-all
+                shrink-0
               "
             >
               MANAGE
@@ -236,10 +242,19 @@ function Header() {
 
         </nav>
 
+        <div
+          className="
+            basis-full
+            sm:basis-auto
+            sm:ml-auto
+            flex
+            items-center
+            gap-4
+            w-full
+            sm:w-auto
+          "
+        >
 
-        {/* RIGHT : AUTH + SEARCH */}
-
-        <div className="ml-auto flex items-center gap-4 shrink-0">
 
           {/* LOGIN / LOGOUT */}
           {isAuthenticated ? (
@@ -256,6 +271,7 @@ function Header() {
                 hover:text-[#39ff14]
                 transition-colors
                 focus:outline-none
+                shrink-0
               "
             >
               LOGOUT
@@ -270,6 +286,7 @@ function Header() {
                 text-white
                 hover:text-[#39ff14]
                 transition-colors
+                shrink-0
               "
             >
               LOGIN
@@ -277,12 +294,12 @@ function Header() {
           )}
 
           {/* SEARCH */}
-          <SearchBar />
-
+          <div className="flex-1 sm:flex-none">
+            <SearchBar />
+          </div>
         </div>
-
-
       </div>
+      
     </header>
   );
 }
