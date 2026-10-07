@@ -139,23 +139,28 @@ function Header() {
         </button>
 
 
-        {/* ─────────────────────────────
-            CENTER : NAVIGATION
-        ───────────────────────────── */}
-
-        <nav
+        {/* NAV + LOGIN ROW */}
+        <div
           className="
             flex
             items-center
-            gap-1
-            ml-0 sm:ml-6
-            w-full sm:w-auto
-            overflow-x-auto
-            font-mono
-            font-bold
+            w-full
+            sm:w-auto
+            sm:flex-1
           "
         >
-
+          {/* NAVIGATION */}
+          <nav
+            className="
+              flex
+              items-center
+              gap-1
+              ml-0 sm:ml-6
+              overflow-x-auto
+              font-mono
+              font-bold
+            "
+          >
 
           {/* ABOUT */}
           <Link
@@ -224,7 +229,7 @@ function Header() {
 
 
         {/* LOGIN / LOGOUT */}
-        <div className="ml-auto shrink-0"></div>
+        <div className="ml-auto shrink-0 ml-4">
           {isAuthenticated ? (
             <button
               onClick={handleLogoutClick}
@@ -239,7 +244,6 @@ function Header() {
                 hover:text-[#39ff14]
                 transition-colors
                 focus:outline-none
-                shrink-0
               "
             >
               LOGOUT
@@ -254,24 +258,27 @@ function Header() {
                 text-white
                 hover:text-[#39ff14]
                 transition-colors
-                shrink-0
               "
             >
               LOGIN
             </Link>
           )}
         </div>
+      </div>
 
-          {/* SEARCH */}
-          <div className="
+        {/* SEARCH */}
+        <div
+          className="
             basis-full
             sm:basis-auto
-            sm:ml-4
+            sm:ml-auto
             w-full
-            sm:w-auto">
-            <SearchBar />
-          </div>
-      
+            sm:w-auto
+          "
+        >
+          <SearchBar />
+        </div>
+      </div>
     </header>
   );
 }
