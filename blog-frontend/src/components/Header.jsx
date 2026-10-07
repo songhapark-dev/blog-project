@@ -39,145 +39,127 @@ function Header() {
         bg-black
       "
     >
-
-      {/* =====================================================
-          HEADER FRAME
-          Desktop : LOGO | NAV + LOGIN | SEARCH
-          Mobile  : LOGO
-                    NAV + LOGIN
-                    SEARCH
-      ===================================================== */}
-
       <div
         className="
-          grid
-          grid-cols-1
-          md:grid-cols-[auto_minmax(0,1fr)_auto]
-          items-center
-          gap-y-4
-          md:gap-y-0
-          md:gap-x-8
           w-full
-          px-4
-          sm:px-6
-          py-4
+          px-[clamp(0.5rem,2vw,1.5rem)]
+          py-[clamp(0.75rem,1.5vw,1rem)]
         "
       >
 
-        {/* =====================================================
-            1. LOGO
-        ===================================================== */}
-
-        <button
-          onClick={handleLogoClick}
-          className="
-            flex
-            items-center
-            gap-3
-            shrink-0
-            bg-transparent
-            border-none
-            p-0
-            focus:outline-none
-            justify-self-start
-          "
-        >
-
-          {/* Smile Icon */}
-          <img
-            src="/smile_icon.png"
-            alt="Songha's Blog"
-            className="
-              w-20
-              h-20
-              object-contain
-              shrink-0
-            "
-          />
-
-          {/* Logo Text */}
-          <div className="flex flex-col items-start shrink-0">
-
-            {/* Blog Name */}
-            <div
-              className="
-                font-mono
-                text-3xl
-                font-bold
-                leading-none
-                tracking-tight
-                whitespace-nowrap
-              "
-            >
-              <span className="text-white">
-                Songha's Blog.
-              </span>
-
-              <span
-                className="
-                  text-[#39ff14]
-                  drop-shadow-[0_0_7px_rgba(57,255,20,0.8)]
-                "
-              >
-                exe
-              </span>
-            </div>
-
-            {/* Subtitle */}
-            <div
-              className="
-                mt-2
-                font-mono
-                text-[10px]
-                font-bold
-                tracking-[0.18em]
-                whitespace-nowrap
-              "
-            >
-              <span className="text-[#008cff]">
-                // VIENNA.
-              </span>{' '}
-
-              <span className="text-[#4b7cff]">
-                PHARMACY.
-              </span>{' '}
-
-              <span className="text-[#704cff]">
-                CODE.
-              </span>{' '}
-
-              <span className="text-[#a43cff]">
-                LIFE.
-              </span>
-            </div>
-
-          </div>
-        </button>
-
-
-        {/* =====================================================
-            2. NAVIGATION + LOGIN
-            하나의 독립된 영역
-        ===================================================== */}
-
+        {/* HEADER CONTENT */}
         <div
           className="
             flex
+            flex-wrap
             items-center
-            min-w-0
+            gap-x-[clamp(0.5rem,2vw,2rem)]
+            gap-y-3
             w-full
           "
         >
 
-          {/* NAVIGATION */}
+          {/* =================================================
+              LOGO
+          ================================================= */}
+
+          <button
+            onClick={handleLogoClick}
+            className="
+              flex
+              items-center
+              gap-[clamp(0.5rem,1vw,0.75rem)]
+              shrink-0
+              bg-transparent
+              border-none
+              p-0
+              focus:outline-none
+            "
+          >
+
+            {/* Smile Icon — 크기 유지 */}
+            <img
+              src="/smile_icon.png"
+              alt="Songha's Blog"
+              className="
+                w-16
+                h-16
+                object-contain
+                shrink-0
+              "
+            />
+
+            {/* Logo Text */}
+            <div className="flex flex-col items-start">
+
+              {/* Blog Name */}
+              <div
+                className="
+                  font-mono
+                  text-[clamp(1.5rem,2.7vw,1.875rem)]
+                  font-bold
+                  leading-none
+                  tracking-tight
+                  whitespace-nowrap
+                "
+              >
+                <span className="text-white">
+                  Songha's Blog.
+                </span>
+
+                <span
+                  className="
+                    text-[#39ff14]
+                    drop-shadow-[0_0_7px_rgba(57,255,20,0.8)]
+                  "
+                >
+                  exe
+                </span>
+              </div>
+
+              {/* Subtitle */}
+              <div
+                className="
+                  mt-[clamp(0.35rem,0.6vw,0.5rem)]
+                  font-mono
+                  text-[clamp(0.4rem,0.7vw,0.625rem)]
+                  font-bold
+                  tracking-[clamp(0.08em,0.15vw,0.18em)]
+                  whitespace-nowrap
+                "
+              >
+                <span className="text-[#008cff]">
+                  // VIENNA.
+                </span>{' '}
+
+                <span className="text-[#4b7cff]">
+                  PHARMACY.
+                </span>{' '}
+
+                <span className="text-[#704cff]">
+                  CODE.
+                </span>{' '}
+
+                <span className="text-[#a43cff]">
+                  LIFE.
+                </span>
+              </div>
+
+            </div>
+          </button>
+
+
+          {/* =================================================
+              NAVIGATION
+          ================================================= */}
+
           <nav
             className="
               flex
               items-center
-              gap-1
+              gap-[clamp(0rem,0.3vw,0.25rem)]
+              shrink
               min-w-0
-              flex-1
-              overflow-x-auto
               font-mono
               font-bold
             "
@@ -187,9 +169,9 @@ function Header() {
             <Link
               to="/about"
               className="
-                px-5
-                py-2
-                text-lg
+                px-[clamp(0.4rem,0.9vw,1.25rem)]
+                py-[clamp(0.3rem,0.5vw,0.5rem)]
+                text-[clamp(0.75rem,1.25vw,1rem)]
                 text-[#8b4cff]
                 border
                 border-transparent
@@ -197,7 +179,8 @@ function Header() {
                 hover:bg-[#8b4cff]/10
                 hover:shadow-[0_0_8px_rgba(139,76,255,0.35)]
                 transition-all
-                shrink-0
+                whitespace-nowrap
+                shrink
               "
             >
               ABOUT
@@ -209,9 +192,9 @@ function Header() {
               <Link
                 to="/write"
                 className="
-                  px-5
-                  py-2
-                  text-lg
+                  px-[clamp(0.4rem,0.9vw,1.25rem)]
+                  py-[clamp(0.3rem,0.5vw,0.5rem)]
+                  text-[clamp(0.75rem,1.25vw,1rem)]
                   text-[#704cff]
                   border
                   border-transparent
@@ -219,7 +202,8 @@ function Header() {
                   hover:bg-[#704cff]/10
                   hover:shadow-[0_0_8px_rgba(112,76,255,0.35)]
                   transition-all
-                  shrink-0
+                  whitespace-nowrap
+                  shrink
                 "
               >
                 WRITE
@@ -232,9 +216,9 @@ function Header() {
               <Link
                 to="/manage"
                 className="
-                  px-5
-                  py-2
-                  text-lg
+                  px-[clamp(0.4rem,0.9vw,1.25rem)]
+                  py-[clamp(0.3rem,0.5vw,0.5rem)]
+                  text-[clamp(0.75rem,1.25vw,1rem)]
                   text-[#a43cff]
                   border
                   border-transparent
@@ -242,7 +226,8 @@ function Header() {
                   hover:bg-[#a43cff]/10
                   hover:shadow-[0_0_8px_rgba(164,60,255,0.35)]
                   transition-all
-                  shrink-0
+                  whitespace-nowrap
+                  shrink
                 "
               >
                 MANAGE
@@ -252,12 +237,14 @@ function Header() {
           </nav>
 
 
-          {/* LOGIN / LOGOUT */}
+          {/* =================================================
+              LOGIN / LOGOUT
+          ================================================= */}
+
           <div
             className="
+              ml-auto
               shrink-0
-              ml-4
-              pl-4
             "
           >
             {isAuthenticated ? (
@@ -268,12 +255,11 @@ function Header() {
                   border-none
                   p-0
                   font-mono
-                  text-lg
+                  text-[clamp(0.75rem,1.25vw,1rem)]
                   font-bold
                   text-white
                   hover:text-[#39ff14]
                   transition-colors
-                  focus:outline-none
                   whitespace-nowrap
                 "
               >
@@ -284,7 +270,7 @@ function Header() {
                 to="/login"
                 className="
                   font-mono
-                  text-base
+                  text-[clamp(0.75rem,1.25vw,1rem)]
                   font-bold
                   text-white
                   hover:text-[#39ff14]
@@ -297,25 +283,22 @@ function Header() {
             )}
           </div>
 
+
+          {/* =================================================
+              SEARCH
+          ================================================= */}
+
+          <div
+            className="
+              shrink
+              min-w-[160px]
+              w-[clamp(160px,22vw,300px)]
+            "
+          >
+            <SearchBar />
+          </div>
+
         </div>
-
-
-        {/* =====================================================
-            3. SEARCH
-            Desktop : 오른쪽
-            Mobile  : 독립된 다음 줄
-        ===================================================== */}
-
-        <div
-          className="
-            w-full
-            md:w-auto
-            md:justify-self-end
-          "
-        >
-          <SearchBar />
-        </div>
-
       </div>
     </header>
   );

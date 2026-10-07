@@ -31,7 +31,6 @@ function SearchBar() {
         flex
         items-center
         w-full
-        sm:w-[300px]
         h-9
         border
         border-[#333]
