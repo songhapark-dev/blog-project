@@ -171,7 +171,7 @@ function Header() {
               className="
                 px-[clamp(0.4rem,0.9vw,1.25rem)]
                 py-[clamp(0.3rem,0.5vw,0.5rem)]
-                text-[clamp(0.9rem,1.45vw,1rem)]
+                text-[clamp(1.2rem,1.65vw,1rem)]
                 text-[#8b4cff]
                 border
                 border-transparent
@@ -194,7 +194,7 @@ function Header() {
                 className="
                   px-[clamp(0.4rem,0.9vw,1.25rem)]
                   py-[clamp(0.3rem,0.5vw,0.5rem)]
-                  text-[clamp(0.9rem,1.45vw,1rem)]
+                  text-[clamp(1.2rem,1.65vw,1rem)]
                   text-[#704cff]
                   border
                   border-transparent
@@ -218,7 +218,7 @@ function Header() {
                 className="
                   px-[clamp(0.4rem,0.9vw,1.25rem)]
                   py-[clamp(0.3rem,0.5vw,0.5rem)]
-                  text-[clamp(0.9rem,1.45vw,1rem)]
+                  text-[clamp(1.2rem,1.65vw,1rem)]
                   text-[#a43cff]
                   border
                   border-transparent
@@ -255,7 +255,7 @@ function Header() {
                   border-none
                   p-0
                   font-mono
-                  text-[clamp(0.85rem,1.35vw,1rem)]
+                  text-[clamp(1rem,1.45vw,1rem)]
                   font-bold
                   text-white
                   hover:text-[#39ff14]
@@ -270,7 +270,7 @@ function Header() {
                 to="/login"
                 className="
                   font-mono
-                  text-[clamp(0.85rem,1.35vw,1rem)]
+                  text-[clamp(1rem,1.45vw,1rem)]
                   font-bold
                   text-white
                   hover:text-[#39ff14]
