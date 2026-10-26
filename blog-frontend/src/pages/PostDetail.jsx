@@ -59,92 +59,105 @@ function PostDetail() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
+      <div className="flex justify-center items-center min-h-screen bg-black">
+        <div className="text-center">
+          <div className="animate-spin h-12 w-12 mx-auto border-2 border-[#333] border-t-[#39ff14]"></div>
+          <p className="mt-6 text-white text-xl font-bold font-mono">Loading...</p>
+        </div>
       </div>
     );
   }
 
   if (!post) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500 mb-4">존재하지 않거나 삭제된 게시글입니다.</p>
-        <Link to="/" className="text-red-500 font-medium hover:underline">← 홈으로 돌아가기</Link>
+      <div className="min-h-screen bg-black flex items-center justify-center px-4">
+        <div className="text-center">
+          <p className="text-[#aaa] font-mono mb-4">존재하지 않거나 삭제된 게시글입니다.</p>
+          <Link to="/" className="text-[#39ff14] font-mono font-bold hover:underline">← 홈으로 돌아가기</Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <article className="max-w-3xl mx-auto px-4 py-8 bg-white rounded-2xl border border-gray-100 shadow-sm mt-4">
-      {/* 1. 상단 메타 정보 (카테고리, 제목, 날짜) */}
-      <header className="mb-6 pb-6 border-b border-gray-100">
-        <span className="inline-block bg-red-100 text-red-800 text-xs font-bold px-3 py-1 rounded-full mb-3">
-          {post.category_name || '일반'}
-        </span>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight mb-4 leading-tight">
-          {post.title}
-        </h1>
-        <div className="flex items-center justify-between text-sm text-gray-400">
-          <div className="flex gap-4">
-            <span>📅 {formatDate(post.created_at)}</span>
-            <span>👁️ {post.view_count} views</span>
-          </div>
-          
-          {isAuthenticated && (
-            <div className="flex gap-2 animate-fade-in">
-              <button
-                onClick={() => navigate(`/edit/${post.id}`)}
-                className="px-3 py-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 font-bold text-xs rounded-lg transition"
-              >
-                수정하기
-              </button>
-              <button
-                onClick={handleFieldDelete}
-                className="px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 font-bold text-xs rounded-lg transition"
-              >
-                삭제
-              </button>
+    <div className="min-h-screen w-full bg-black px-4 py-6 md:py-10">
+      <article className="relative max-w-3xl mx-auto px-5 py-8 md:px-10 md:py-10 bg-[#151515] border border-[#333]">
+        {/* PIXEL CORNERS */}
+        <div className="absolute top-0 right-0 w-4 h-px bg-[#39ff14]" />
+        <div className="absolute top-0 right-0 w-px h-4 bg-[#39ff14]" />
+        <div className="absolute bottom-0 left-0 w-4 h-px bg-[#bf00ff]" />
+        <div className="absolute bottom-0 left-0 w-px h-4 bg-[#bf00ff]" />
+
+        {/* 1. 상단 메타 정보 (카테고리, 제목, 날짜) */}
+        <header className="mb-6 pb-6 border-b border-[#333]">
+          <span className="inline-block border border-[#bf00ff] bg-black text-[#bf00ff] text-[10px] font-mono font-bold tracking-widest px-2 py-1 mb-4">
+            {post.category_name || 'GENERAL'}
+          </span>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-4 leading-tight">
+            {post.title}
+          </h1>
+          <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[#888]">
+            <div className="flex gap-4">
+              <span>{formatDate(post.created_at)}</span>
+              <span>{'// '}{post.view_count} VIEWS</span>
             </div>
-          )}
-        </div>
-      </header>
 
-      {/* 2. 대문 대표 이미지 영역 [버그 방지 및 Cloudinary 절대 경로 단일화 완료] */}
-      {post.image && (
-        <div className="w-full max-h-[450px] overflow-hidden rounded-xl mb-8 shadow-sm bg-gray-50">
-          <img 
-            src={post.image} // 🎯 백엔드 시리얼라이저 설정을 전적으로 신뢰하여 절대주소 그대로 다이렉트 주입!
-            alt={post.title} 
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              console.error("상세페이지 대표 이미지 로드 실패 주소:", e.target.src);
-            }}
-          />
-        </div>
-      )}
+            {isAuthenticated && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => navigate(`/edit/${post.id}`)}
+                  className="px-3 py-1.5 border border-[#333] bg-black text-white hover:text-[#39ff14] hover:border-[#39ff14] font-mono font-bold text-xs transition-all"
+                >
+                  EDIT
+                </button>
+                <button
+                  onClick={handleFieldDelete}
+                  className="px-3 py-1.5 border border-[#333] bg-black text-white hover:text-[#ff3b5c] hover:border-[#ff3b5c] font-mono font-bold text-xs transition-all"
+                >
+                  DELETE
+                </button>
+              </div>
+            )}
+          </div>
+        </header>
 
-      {/* 3. 본문 텍스트 영역 (마크다운 파싱 정상 작동 확인 완료) */}
-      <div 
-        className="text-gray-800 text-base md:text-lg leading-relaxed space-y-4 font-normal break-words min-h-[200px] prose max-w-none"
-        dangerouslySetInnerHTML={{ __html: mdParser.render(post.content || '') }}
-      />
+        {/* 2. 대표 이미지 */}
+        {post.image && (
+          <div className="w-full max-h-[450px] overflow-hidden mb-8 border border-[#333] bg-black">
+            <img
+              src={post.image}
+              alt={post.title}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                console.error("상세페이지 대표 이미지 로드 실패 주소:", e.target.src);
+              }}
+            />
+          </div>
+        )}
 
-      {/* 4. 하단 네비게이션 버튼 */}
-      <footer className="mt-12 pt-6 border-t border-gray-100 flex justify-between">
-        <button 
-          onClick={() => navigate(-1)} 
-          className="text-gray-600 hover:text-red-500 font-medium transition flex items-center gap-1 text-sm"
-        >
-          ← 뒤로 가기
-        </button>
-        <Link 
-          to="/" 
-          className="bg-gray-900 text-white hover:bg-red-500 px-4 py-2 rounded-xl font-medium text-sm transition shadow-sm"
-        >
-          목록으로
-        </Link>
-      </footer>
-    </article>
+        {/* 3. 본문 (마크다운) */}
+        <div
+          className="post-content text-[#ddd] text-base md:text-lg leading-relaxed break-words min-h-[200px]"
+          dangerouslySetInnerHTML={{ __html: mdParser.render(post.content || '') }}
+        />
+
+        {/* 4. 하단 네비게이션 */}
+        <footer className="mt-12 pt-6 border-t border-[#333] flex justify-between items-center font-mono">
+          <button
+            onClick={() => navigate(-1)}
+            className="text-[#aaa] hover:text-[#39ff14] font-bold transition-colors text-sm"
+          >
+            ← BACK
+          </button>
+          <Link
+            to="/"
+            className="border border-[#333] bg-black text-white hover:text-[#39ff14] hover:border-[#39ff14] hover:shadow-[0_0_12px_rgba(57,255,20,0.35)] px-4 py-2 font-bold text-sm transition-all"
+          >
+            LIST
+          </Link>
+        </footer>
+      </article>
+    </div>
   );
 }
 
