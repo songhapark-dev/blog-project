@@ -61,8 +61,14 @@ function PostDetail() {
     return (
       <div className="flex justify-center items-center min-h-screen bg-black">
         <div className="text-center">
-          <div className="animate-spin h-12 w-12 mx-auto border-2 border-[#333] border-t-[#39ff14]"></div>
-          <p className="mt-6 text-white text-xl font-bold font-mono">Loading...</p>
+          <img
+            src="/smile_loading.png"
+            alt="Loading"
+            className="w-24 h-24 mx-auto animate-spin"
+          />
+          <p className="mt-6 text-white text-xl font-bold font-mono">
+            Loading...
+          </p>
         </div>
       </div>
     );
@@ -81,22 +87,16 @@ function PostDetail() {
 
   return (
     <div className="min-h-screen w-full bg-black px-4 py-6 md:py-10">
-      <article className="relative max-w-3xl mx-auto px-5 py-8 md:px-10 md:py-10 bg-[#151515] border border-[#333]">
-        {/* PIXEL CORNERS */}
-        <div className="absolute top-0 right-0 w-4 h-px bg-[#39ff14]" />
-        <div className="absolute top-0 right-0 w-px h-4 bg-[#39ff14]" />
-        <div className="absolute bottom-0 left-0 w-4 h-px bg-[#bf00ff]" />
-        <div className="absolute bottom-0 left-0 w-px h-4 bg-[#bf00ff]" />
-
+      <article className="max-w-[760px] mx-auto px-5 py-8 md:px-10 md:py-12 bg-[#181818] border border-[#2a2a2a]">
         {/* 1. 상단 메타 정보 (카테고리, 제목, 날짜) */}
         <header className="mb-6 pb-6 border-b border-[#333]">
           <span className="inline-block border border-[#bf00ff] bg-black text-[#bf00ff] text-[10px] font-mono font-bold tracking-widest px-2 py-1 mb-4">
             {post.category_name || 'GENERAL'}
           </span>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-4 leading-tight">
+          <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight mb-4 leading-snug">
             {post.title}
           </h1>
-          <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[#888]">
+          <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[#777]">
             <div className="flex gap-4">
               <span>{formatDate(post.created_at)}</span>
               <span>{'// '}{post.view_count} VIEWS</span>
@@ -137,7 +137,7 @@ function PostDetail() {
 
         {/* 3. 본문 (마크다운) */}
         <div
-          className="post-content text-[#ddd] text-base md:text-lg leading-relaxed break-words min-h-[200px]"
+          className="post-content break-words min-h-[200px]"
           dangerouslySetInnerHTML={{ __html: mdParser.render(post.content || '') }}
         />
 
