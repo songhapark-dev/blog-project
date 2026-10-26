@@ -24,6 +24,7 @@ function WritePage() {
   const [thumbnail, setThumbnail] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [categoriesLoading, setCategoriesLoading] = useState(true); // 진입 시 카테고리 로딩
 
   const BACKEND_URL = 'https://blog-backend-35eq.onrender.com';
 
@@ -42,7 +43,8 @@ function WritePage() {
           setSelectedCategory(data[0].id);
         }
       })
-      .catch(err => console.error('카테고리 로드 실패', err));
+      .catch(err => console.error('카테고리 로드 실패', err))
+      .finally(() => setCategoriesLoading(false));
   }, [isAuthenticated, navigate]);
 
   // Cloudinary Upload (Promise version - Thumbnail & Editor Image)
@@ -162,6 +164,22 @@ function WritePage() {
           <span>📝</span> 신규 마크다운 에세이 작성
         </h1>
       </div>
+
+      {/* 진입·발행 중 로딩 오버레이 (빨간 스마일 회전) */}
+      {(loading || categoriesLoading) && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90">
+          <div className="text-center">
+            <img
+              src="/smile_error.png"
+              alt="Loading"
+              className="w-24 h-24 mx-auto animate-spin"
+            />
+            <p className="mt-6 text-white text-xl font-bold font-mono">
+              Loading...
+            </p>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
