@@ -25,12 +25,16 @@ function CategoryGrid({ categoryName, categoryId, posts }) {
         <Link
           to={`/category/${categoryId}`}
           className="
-            text-[9px]
+            py-1
+            text-xs
+            md:text-sm
             font-mono
+            font-bold
             tracking-wider
-            text-[#555]
+            text-[#d4d4d4]
             hover:text-[#39ff14]
             transition-colors
+            whitespace-nowrap
           "
         >
           VIEW ALL →

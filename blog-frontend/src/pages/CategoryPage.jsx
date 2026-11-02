@@ -67,7 +67,7 @@ function CategoryPage() {
           : null;
 
         setCategoryName(
-          currentCategory ? currentCategory.name : '게시판'
+          currentCategory ? currentCategory.name : 'BOARD'
         );
       } catch (err) {
         console.error(
@@ -84,53 +84,72 @@ function CategoryPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+      <div className="flex items-center justify-center min-h-screen bg-black">
+        <div className="text-center">
+          <img
+            src="/smile_loading.png"
+            alt="Loading"
+            className="w-24 h-24 mx-auto animate-spin"
+          />
+          <p className="mt-6 text-white text-xl font-bold font-mono">
+            Loading...
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div
+      className="min-h-screen w-full"
+      style={{
+        backgroundImage: "url('/background_big.png')",
+        backgroundRepeat: 'repeat',
+        backgroundSize: '600px auto',
+        backgroundPosition: 'top center',
+        backgroundColor: '#000',
+      }}
+    >
       {/* 상단 카테고리 헤더 */}
-      <div className="border-b border-gray-100 pb-6 mb-10">
-        <h1 className="text-3xl font-extrabold text-gray-950 flex items-center gap-2">
-          <span className="text-red-500">#</span> {categoryName}
-        </h1>
-
-        <p className="text-sm text-gray-400 mt-2">
-          총{' '}
-          <span className="font-semibold text-gray-700">
-            {posts.length}개
-          </span>
-          의 게시글이 있습니다.
-        </p>
-      </div>
-
-      {/* 게시글 그리드 */}
-      {posts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
-          <p className="text-gray-400 text-lg mb-4">
-            아직 작성된 게시글이 없습니다. 📭
+      <section className="w-full bg-[#151515]">
+        <div className="max-w-6xl mx-auto px-4 py-6 md:px-6 md:py-10">
+          <div className="text-[10px] font-mono text-[#777] tracking-[0.25em] mb-2">
+            CATEGORY
+          </div>
+          <h1 className="text-2xl md:text-3xl font-black font-mono tracking-wider text-white uppercase">
+            <span className="text-[#39ff14]">#</span> {categoryName}
+          </h1>
+          <p className="mt-3 text-xs md:text-sm font-mono text-[#aaa]">
+            {'// '}
+            <span className="font-bold text-[#d4d4d4]">{posts.length}</span> POSTS
           </p>
-
-          <Link
-            to="/"
-            className="text-sm bg-gray-900 text-white px-4 py-2 rounded-xl font-medium hover:bg-red-600 transition"
-          >
-            홈으로 가기
-          </Link>
         </div>
-      )}
+      </section>
+
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* 게시글 그리드 */}
+        {posts.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {posts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20 bg-black border border-[#333]">
+            <p className="text-[#aaa] font-mono mb-6">
+              아직 작성된 게시글이 없습니다.
+            </p>
+            <Link
+              to="/"
+              className="inline-block border border-[#333] bg-black text-white hover:text-[#39ff14] hover:border-[#39ff14] hover:shadow-[0_0_12px_rgba(57,255,20,0.35)] px-4 py-2 font-mono font-bold text-sm transition-all"
+            >
+              HOME
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
 export default CategoryPage;
-

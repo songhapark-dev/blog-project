@@ -86,7 +86,16 @@ function PostDetail() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-black px-4 py-6 md:py-10">
+    <div
+      className="min-h-screen w-full px-4 py-6 md:py-10"
+      style={{
+        backgroundImage: "url('/background_big.png')",
+        backgroundRepeat: 'repeat',
+        backgroundSize: '600px auto',
+        backgroundPosition: 'top center',
+        backgroundColor: '#000',
+      }}
+    >
       <article className="max-w-[760px] mx-auto px-5 py-8 md:px-10 md:py-12 bg-[#181818] border border-[#2a2a2a]">
         {/* 1. 상단 메타 정보 (카테고리, 제목, 날짜) */}
         <header className="mb-6 pb-6 border-b border-[#333]">
