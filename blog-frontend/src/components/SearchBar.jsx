@@ -15,8 +15,9 @@ function SearchBar() {
   const handleSearch = (e) => {
     e.preventDefault();
 
-    if (searchQuery.trim()) {
-      navigate('/search');
+    const q = searchQuery.trim();
+    if (q) {
+      navigate(`/search?q=${encodeURIComponent(q)}`);
     }
   };
 
@@ -70,13 +71,24 @@ function SearchBar() {
           justify-center
           bg-transparent
           border-none
-          text-[#888]
-          text-lg
-          hover:text-white
-          transition-colors
+          group
         "
       >
-        🔍
+        {/* 평소엔 회색, hover 시 녹색 */}
+        <span className="relative w-6 h-6">
+          <img
+            src="/search_icon_gray.png"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-contain transition-opacity group-hover:opacity-0"
+          />
+          <img
+            src="/search_icon.png"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity group-hover:opacity-100"
+          />
+        </span>
       </button>
     </form>
   );

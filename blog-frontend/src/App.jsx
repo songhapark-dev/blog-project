@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage';
 import WritePage from './pages/WritePage';
 import ManagePage from './pages/ManagePage';
 import EditPage from './pages/EditPage'; 
+import SearchPage from './pages/SearchPage';
 
 function App() {
   return (
@@ -28,6 +29,9 @@ function App() {
             
             {/* 카테고리별 페이지 라우트 */}
             <Route path="/category/:categoryId" element={<CategoryPage />} />
+
+            {/* 검색 결과 페이지 (/search?q=검색어) */}
+            <Route path="/search" element={<SearchPage />} />
 
             {/* 관리자 로그인 페이지 비밀 선로 */}
             <Route path="/login" element={<LoginPage />} />
