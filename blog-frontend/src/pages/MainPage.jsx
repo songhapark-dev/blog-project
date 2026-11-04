@@ -158,8 +158,9 @@ function MainPage() {
               </div>
 
               <p className="text-sm md:text-base text-[#aaa] leading-relaxed font-medium mt-2 font-mono">
-                약사, 비엔나에서 독일어 공부중 <br className="hidden md:inline" />
-                심심해 죽겠어서 시작한 일상의 기록
+                A pharmacist studying German in Vienna.
+                <br className="hidden md:inline" />A journal of everyday life, started out of sheer boredom.
+                <br className="hidden md:inline" />German, Piano, Coding, Vienna life
               </p>
 
               {/* Social links */}

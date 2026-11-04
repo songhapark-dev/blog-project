@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useStore } from '../store/store'; // Zustand 금고 연동
 import MarkdownIt from 'markdown-it';
+import Comments from '../components/Comments';
 
 const mdParser = new MarkdownIt({
   html: true,        
@@ -166,6 +167,9 @@ function PostDetail() {
           </Link>
         </footer>
       </article>
+
+      {/* 5. 댓글 */}
+      <Comments key={post.id} postId={post.id} initialComments={post.comments || []} />
     </div>
   );
 }
