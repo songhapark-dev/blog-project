@@ -1,12 +1,43 @@
 # blog-backend/posts/serializers.py
+import re
 from rest_framework import serializers
 from .models import Post, Category, Comment
 
 class CommentSerializer(serializers.ModelSerializer):
+    # 스팸 방지용 숨은 입력칸(honeypot): 사람은 볼 수 없어서 비워두고, 봇은 채움
+    website = serializers.CharField(write_only=True, required=False, allow_blank=True)
+
+    AUTHOR_MAX = 20
+    CONTENT_MAX = 1000
+    MAX_LINKS = 2
+
     class Meta:
         model = Comment
-        fields = ['id', 'author', 'content', 'created_at']
+        fields = ['id', 'post', 'author', 'content', 'created_at', 'website']
         read_only_fields = ['id', 'created_at']
+
+    def validate_author(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError('닉네임을 입력해 주세요.')
+        if len(value) > self.AUTHOR_MAX:
+            raise serializers.ValidationError(f'닉네임은 {self.AUTHOR_MAX}자 이하로 입력해 주세요.')
+        return value
+
+    def validate_content(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError('댓글 내용을 입력해 주세요.')
+        if len(value) > self.CONTENT_MAX:
+            raise serializers.ValidationError(f'댓글은 {self.CONTENT_MAX}자 이하로 입력해 주세요.')
+        if len(re.findall(r'https?://|www\.', value, re.IGNORECASE)) > self.MAX_LINKS:
+            raise serializers.ValidationError('링크가 너무 많이 포함되어 있습니다.')
+        return value
+
+    def validate(self, attrs):
+        if attrs.pop('website', ''):
+            raise serializers.ValidationError('댓글을 등록할 수 없습니다.')
+        return attrs
 
 
 class CategorySerializer(serializers.ModelSerializer):

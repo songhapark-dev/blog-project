@@ -4,6 +4,7 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
+from rest_framework.throttling import AnonRateThrottle
 from django.db.models import Q
 from .models import Post, Category, Comment
 from .serializers import (
@@ -126,14 +127,33 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 # 3. Comment ViewSet (댓글)
+# 방문자 댓글 도배 방지: 같은 사람(IP)이 1분/하루에 쓸 수 있는 개수 제한 (관리자는 제외)
+class CommentBurstThrottle(AnonRateThrottle):
+    scope = 'comment_burst'
+
+
+class CommentDailyThrottle(AnonRateThrottle):
+    scope = 'comment_daily'
+
+
 class CommentViewSet(viewsets.ModelViewSet):
+    """
+    - GET /comments/?post={id}  → 댓글 조회 (누구나)
+    - POST /comments/           → 댓글 작성 (누구나, 닉네임만)
+    - PUT/PATCH/DELETE          → 오직 관리자만
+    """
     serializer_class = CommentSerializer
     lookup_field = 'id'
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve', 'create']:
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
+
+    def get_throttles(self):
+        if self.action == 'create':
+            return [CommentBurstThrottle(), CommentDailyThrottle()]
+        return []
         
     def get_queryset(self):
         queryset = Comment.objects.all()

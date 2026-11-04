@@ -167,6 +167,12 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+
+    # 댓글 도배 방지 (방문자 1명 기준)
+    'DEFAULT_THROTTLE_RATES': {
+        'comment_burst': '3/min',
+        'comment_daily': '30/day',
+    },
 }
 
 
